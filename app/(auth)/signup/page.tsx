@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { SignupForm } from "@/components/auth/signup-form";
 
 export default function SignupPage() {
   return (
@@ -14,37 +14,7 @@ export default function SignupPage() {
         </p>
       </div>
 
-      <form className="space-y-4">
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">
-            Business name
-          </span>
-          <input
-            className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
-            placeholder="Auckland Plumbing Co."
-            type="text"
-          />
-        </label>
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">Email</span>
-          <input
-            className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
-            placeholder="you@example.com"
-            type="email"
-          />
-        </label>
-        <label className="block">
-          <span className="text-sm font-medium text-slate-700">Password</span>
-          <input
-            className="mt-2 h-11 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
-            placeholder="••••••••"
-            type="password"
-          />
-        </label>
-        <Button className="w-full" type="submit">
-          Sign Up
-        </Button>
-      </form>
+      <SignupForm />
 
       <p className="mt-6 text-center text-sm text-slate-600">
         Already have an account?{" "}

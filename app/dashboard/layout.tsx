@@ -1,6 +1,10 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 
+import { logout } from "@/app/(auth)/actions";
 import { AppLogo } from "@/components/app-logo";
+import { Button } from "@/components/ui/button";
+import { createClient } from "@/lib/supabase/server";
 
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
@@ -11,11 +15,20 @@ const navItems = [
   { href: "/dashboard/settings", label: "Settings" },
 ];
 
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return (
     <div className="min-h-full bg-slate-100">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-[260px_1fr]">
@@ -40,19 +53,34 @@ export default function DashboardLayout({
               </Link>
             ))}
           </nav>
+          <form action={logout} className="mt-4 lg:hidden">
+            <Button className="h-10 w-full" type="submit" variant="secondary">
+              Log out
+            </Button>
+          </form>
         </aside>
         <div className="flex min-w-0 flex-col">
           <header className="hidden border-b border-slate-200 bg-white px-8 py-4 lg:block">
             <div className="flex items-center justify-between">
-              <p className="text-sm font-medium text-slate-500">
-                PipeFlow Demo Workspace
-              </p>
-              <Link
-                className="text-sm font-semibold text-slate-700 hover:text-slate-950"
-                href="/"
-              >
-                View public site
-              </Link>
+              <div>
+                <p className="text-sm font-medium text-slate-500">
+                  PipeFlow Workspace
+                </p>
+                <p className="text-sm text-slate-700">{user.email}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <Link
+                  className="text-sm font-semibold text-slate-700 hover:text-slate-950"
+                  href="/"
+                >
+                  View public site
+                </Link>
+                <form action={logout}>
+                  <Button className="h-9 px-4" type="submit" variant="secondary">
+                    Log out
+                  </Button>
+                </form>
+              </div>
             </div>
           </header>
           <main className="flex-1 px-5 py-6 sm:px-8 lg:py-8">{children}</main>
