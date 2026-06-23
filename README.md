@@ -21,7 +21,3 @@ pnpm build    # production build
 pnpm start    # run production build
 pnpm lint     # ESLint
 ```
-
-## Documentation
-
-Project specs and development rules live in [`docs/`](./docs/).
