@@ -34,14 +34,14 @@ export default function Home() {
             </h1>
             <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
               PipeFlow helps Kiwi plumbers manage customers, jobs, quotes, and
-              invoices from one simple dashboard.
+              invoices from one protected dashboard built with Supabase.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <Link
                 className={buttonVariants({ className: "w-full sm:w-auto" })}
                 href="/dashboard"
               >
-                View Demo
+                Open Dashboard
               </Link>
               <Link
                 className={buttonVariants({
@@ -60,12 +60,14 @@ export default function Home() {
               <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
                   <p className="text-sm font-medium text-slate-500">
-                    Today&apos;s jobs
+                    Demo workspace
                   </p>
-                  <p className="text-2xl font-semibold text-slate-950">12</p>
+                  <p className="text-2xl font-semibold text-slate-950">
+                    Live data
+                  </p>
                 </div>
                 <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-                  Live demo
+                  Portfolio demo
                 </span>
               </div>
               <div className="mt-5 space-y-3">
@@ -82,7 +84,7 @@ export default function Home() {
                       <p className="font-medium text-slate-950">{title}</p>
                       <p className="text-sm text-slate-500">{area}</p>
                     </div>
-                    <p className="text-sm font-medium text-slate-700">
+                    <p className="ml-4 whitespace-nowrap text-sm font-medium text-slate-700">
                       {status}
                     </p>
                   </div>
