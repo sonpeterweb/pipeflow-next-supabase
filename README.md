@@ -2,6 +2,8 @@
 
 PipeFlow is a portfolio SaaS demo for small trade businesses in New Zealand. It helps owner-operated plumbing and trade teams manage customers, jobs, quotes, invoices, and dashboard metrics from a protected workspace.
 
+The project is designed to demonstrate a production-style MVP architecture: authenticated routes, Supabase-backed CRUD workflows, Row Level Security, Server Components, Server Actions, validation, and focused tests.
+
 ## Stack
 
 - Next.js 16 App Router
@@ -27,6 +29,14 @@ PipeFlow is a portfolio SaaS demo for small trade businesses in New Zealand. It 
 - Invoices CRUD with optional customer and job links
 - SQL migration for schema, indexes, triggers, and RLS policies
 - Focused unit and validation tests
+
+## Architecture Overview
+
+- `app/` contains the Next.js App Router pages, layouts, and Server Actions.
+- `app/dashboard/*` contains protected SaaS workspace pages.
+- `lib/*/validation.ts` contains Zod validation for form-backed resources.
+- `lib/supabase/` contains browser, server, and proxy Supabase clients.
+- `supabase/migrations/001_initial_schema.sql` contains the database schema and RLS policies.
 
 ## Local Setup
 
@@ -108,3 +118,17 @@ This app is ready for Vercel-style deployment:
 4. Deploy the Next.js app.
 
 No service role key is required for the implemented app flows.
+
+## Roadmap
+
+Potential future work:
+
+- Improved settings page
+- Recent activity on the dashboard
+- Seed script for local-only demo data
+- Role-based teams
+- Quote/invoice PDF generation
+- Payments
+- Customer portal
+
+These are outside the current MVP.
