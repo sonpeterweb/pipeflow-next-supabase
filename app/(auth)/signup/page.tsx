@@ -10,7 +10,7 @@ export default function SignupPage() {
           Create account
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Start setting up a plumbing business workspace.
+          Create a demo workspace for a plumbing or trade business.
         </p>
       </div>
 

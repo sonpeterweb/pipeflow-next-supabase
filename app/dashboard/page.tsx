@@ -74,7 +74,7 @@ export default async function DashboardPage() {
           Dashboard
         </h1>
         <p className="mt-2 text-slate-600">
-          Overview of customers, jobs, invoices, and revenue.
+          Live overview of your customers, jobs, invoices, and revenue.
         </p>
       </div>
 

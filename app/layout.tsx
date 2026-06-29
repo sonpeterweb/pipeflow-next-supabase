@@ -13,9 +13,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "PipeFlow",
+  title: {
+    default: "PipeFlow",
+    template: "%s | PipeFlow",
+  },
   description:
-    "Job management for Kiwi plumbing and trade businesses — customers, jobs, quotes, and invoices in one dashboard.",
+    "A portfolio SaaS demo for Kiwi trade businesses to manage customers, jobs, quotes, invoices, and dashboard metrics.",
 };
 
 export default function RootLayout({

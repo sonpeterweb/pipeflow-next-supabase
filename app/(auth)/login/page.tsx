@@ -10,7 +10,7 @@ export default function LoginPage() {
           Sign in
         </h1>
         <p className="mt-2 text-sm leading-6 text-slate-600">
-          Access the PipeFlow demo dashboard.
+          Access your PipeFlow workspace with Supabase authentication.
         </p>
       </div>
 
