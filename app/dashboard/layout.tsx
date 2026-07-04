@@ -30,7 +30,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-full bg-slate-100">
+    <div className="min-h-full bg-slate-50">
       <div className="lg:grid lg:min-h-screen lg:grid-cols-[260px_1fr]">
         <aside className="border-b border-slate-200 bg-white px-5 py-4 lg:border-b-0 lg:border-r lg:px-6 lg:py-6">
           <div className="flex items-center justify-between gap-4 lg:block">
@@ -45,7 +45,7 @@ export default async function DashboardLayout({
           <nav className="mt-5 flex gap-2 overflow-x-auto pb-1 lg:mt-8 lg:flex-col lg:overflow-visible lg:pb-0">
             {navItems.map((item) => (
               <Link
-                className="whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
+                className="whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 hover:text-slate-950"
                 href={item.href}
                 key={item.href}
               >
@@ -54,7 +54,7 @@ export default async function DashboardLayout({
             ))}
           </nav>
           <form action={logout} className="mt-4 lg:hidden">
-            <Button className="h-10 w-full" type="submit" variant="secondary">
+            <Button className="h-10 w-full" type="submit" variant="outline">
               Log out
             </Button>
           </form>
@@ -76,7 +76,7 @@ export default async function DashboardLayout({
                   View public site
                 </Link>
                 <form action={logout}>
-                  <Button className="h-9 px-4" type="submit" variant="secondary">
+                  <Button className="h-9 px-4" type="submit" variant="outline">
                     Log out
                   </Button>
                 </form>

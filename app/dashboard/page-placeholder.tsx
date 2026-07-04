@@ -1,3 +1,5 @@
+import { EmptyState } from "@/components/ui/empty-state";
+
 export function PagePlaceholder({
   description,
   title,
@@ -13,11 +15,10 @@ export function PagePlaceholder({
         </h1>
         <p className="mt-2 text-slate-600">{description}</p>
       </div>
-      <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-        <p className="text-sm font-medium text-slate-500">
-          UI shell only. Functionality will be added in a later ticket.
-        </p>
-      </div>
+      <EmptyState
+        description="Functionality will be added in a later ticket."
+        title="UI shell only"
+      />
     </section>
   );
 }

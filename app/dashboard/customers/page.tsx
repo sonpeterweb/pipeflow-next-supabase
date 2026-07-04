@@ -6,6 +6,14 @@ import {
   updateCustomer,
 } from "@/app/dashboard/customers/actions";
 import { Button } from "@/components/ui/button";
+import { CardSection } from "@/components/ui/card";
+import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
+import {
+  Field,
+  FieldLabel,
+  Input,
+  Textarea,
+} from "@/components/ui/form-controls";
 import { createClient } from "@/lib/supabase/server";
 
 type Customer = {
@@ -46,10 +54,10 @@ function Message({
   const classes =
     tone === "error"
       ? "border-red-200 bg-red-50 text-red-700"
-      : "border-emerald-200 bg-emerald-50 text-emerald-800";
+      : "border-green-200 bg-green-50 text-green-800";
 
   return (
-    <p className={`rounded-md border px-4 py-3 text-sm font-medium ${classes}`}>
+    <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
       {message}
     </p>
   );
@@ -69,29 +77,27 @@ function TextField({
   type?: string;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <input
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>{label}</FieldLabel>
+      <Input
         defaultValue={defaultValue}
         name={name}
         required={required}
         type={type}
       />
-    </label>
+    </Field>
   );
 }
 
 function NotesField({ defaultValue }: { defaultValue?: string }) {
   return (
-    <label className="block sm:col-span-2">
-      <span className="text-sm font-medium text-slate-700">Notes</span>
-      <textarea
-        className="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field className="sm:col-span-2">
+      <FieldLabel>Notes</FieldLabel>
+      <Textarea
         defaultValue={defaultValue}
         name="notes"
       />
-    </label>
+    </Field>
   );
 }
 
@@ -129,15 +135,14 @@ function CustomerForm({
         name="phone"
         type="tel"
       />
-      <label className="block sm:col-span-2">
-        <span className="text-sm font-medium text-slate-700">Address</span>
-        <input
-          className="mt-2 h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+      <Field className="sm:col-span-2">
+        <FieldLabel>Address</FieldLabel>
+        <Input
           defaultValue={fieldValue(customer?.address ?? null)}
           name="address"
           type="text"
         />
-      </label>
+      </Field>
       <NotesField defaultValue={fieldValue(customer?.notes ?? null)} />
       <div className="sm:col-span-2">
         <Button type="submit">{submitLabel}</Button>
@@ -148,12 +153,10 @@ function CustomerForm({
 
 function EmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-950">No customers yet</h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Add your first customer to start tracking trade work in PipeFlow.
-      </p>
-    </div>
+    <EmptyStateView
+      description="Add your first customer to start tracking trade work in PipeFlow."
+      title="No customers yet"
+    />
   );
 }
 
@@ -162,7 +165,7 @@ function CustomerCard({ customer }: { customer: Customer }) {
   const deleteCustomerWithId = deleteCustomer.bind(null, customer.id);
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h2 className="text-lg font-semibold text-slate-950">
@@ -197,7 +200,7 @@ function CustomerCard({ customer }: { customer: Customer }) {
       </div>
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-md border border-slate-200 bg-slate-50 p-4">
+        <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-slate-800">
             Edit customer
           </summary>
@@ -210,7 +213,7 @@ function CustomerCard({ customer }: { customer: Customer }) {
           </div>
         </details>
 
-        <details className="rounded-md border border-red-200 bg-red-50 p-4">
+        <details className="rounded-lg border border-red-200 bg-red-50 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-red-800">
             Delete customer
           </summary>
@@ -219,7 +222,7 @@ function CustomerCard({ customer }: { customer: Customer }) {
               This removes {customer.name}. Existing linked records may keep a
               blank customer reference.
             </p>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="destructive">
               Confirm delete
             </Button>
           </form>
@@ -267,15 +270,12 @@ export default async function CustomersPage({
       ) : null}
       {error ? <Message message={error.message} tone="error" /> : null}
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Add customer</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Store contact details for a customer or site.
-        </p>
-        <div className="mt-5">
-          <CustomerForm action={createCustomer} submitLabel="Create customer" />
-        </div>
-      </div>
+      <CardSection
+        description="Store contact details for a customer or site."
+        title="Add customer"
+      >
+        <CustomerForm action={createCustomer} submitLabel="Create customer" />
+      </CardSection>
 
       <div className="space-y-4">
         {customers.length > 0 ? (

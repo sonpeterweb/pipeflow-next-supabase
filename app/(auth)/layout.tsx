@@ -24,7 +24,7 @@ export default async function AuthLayout({
         <div className="mb-8 flex justify-center">
           <AppLogo />
         </div>
-        <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
           {children}
         </div>
         <Link

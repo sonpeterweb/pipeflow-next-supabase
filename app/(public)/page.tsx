@@ -26,7 +26,7 @@ export default function Home() {
       <main className="flex flex-1 items-center px-5 py-14 sm:py-20">
         <section className="mx-auto grid w-full max-w-6xl gap-10 lg:grid-cols-[1fr_420px] lg:items-center">
           <div className="max-w-2xl">
-            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-emerald-700">
+            <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-primary">
               Local business management SaaS
             </p>
             <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
@@ -45,7 +45,7 @@ export default function Home() {
               </Link>
               <Link
                 className={buttonVariants({
-                  variant: "secondary",
+                  variant: "outline",
                   className: "w-full sm:w-auto",
                 })}
                 href="/login"
@@ -55,8 +55,8 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4 shadow-sm">
-            <div className="rounded-md bg-white p-5 shadow-sm">
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
+            <div className="rounded-xl bg-white p-6 shadow-sm">
               <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
                   <p className="text-sm font-medium text-slate-500">
@@ -66,7 +66,7 @@ export default function Home() {
                     Live data
                   </p>
                 </div>
-                <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
                   Portfolio demo
                 </span>
               </div>
@@ -77,7 +77,7 @@ export default function Home() {
                   ["Quote follow-up", "Ponsonby", "Draft"],
                 ].map(([title, area, status]) => (
                   <div
-                    className="flex items-center justify-between rounded-md border border-slate-200 p-3"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
                     key={title}
                   >
                     <div>

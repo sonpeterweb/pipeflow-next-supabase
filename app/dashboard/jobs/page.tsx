@@ -2,6 +2,15 @@ import { redirect } from "next/navigation";
 
 import { createJob, deleteJob, updateJob } from "@/app/dashboard/jobs/actions";
 import { Button } from "@/components/ui/button";
+import { CardSection } from "@/components/ui/card";
+import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
+import {
+  Field,
+  FieldLabel,
+  Input,
+  Select,
+  Textarea,
+} from "@/components/ui/form-controls";
 import { jobPriorities, jobStatuses } from "@/lib/jobs/validation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -103,10 +112,10 @@ function Message({
   const classes =
     tone === "error"
       ? "border-red-200 bg-red-50 text-red-700"
-      : "border-emerald-200 bg-emerald-50 text-emerald-800";
+      : "border-green-200 bg-green-50 text-green-800";
 
   return (
-    <p className={`rounded-md border px-4 py-3 text-sm font-medium ${classes}`}>
+    <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
       {message}
     </p>
   );
@@ -128,17 +137,16 @@ function TextField({
   type?: string;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <input
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>{label}</FieldLabel>
+      <Input
         defaultValue={defaultValue}
         name={name}
         required={required}
         step={step}
         type={type}
       />
-    </label>
+    </Field>
   );
 }
 
@@ -152,14 +160,13 @@ function TextAreaField({
   name: string;
 }) {
   return (
-    <label className="block sm:col-span-2">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <textarea
-        className="mt-2 min-h-24 w-full rounded-md border border-slate-300 px-3 py-2 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field className="sm:col-span-2">
+      <FieldLabel>{label}</FieldLabel>
+      <Textarea
         defaultValue={defaultValue}
         name={name}
       />
-    </label>
+    </Field>
   );
 }
 
@@ -171,10 +178,9 @@ function CustomerSelect({
   defaultValue?: string | null;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Customer</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Customer</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? ""}
         name="customer_id"
       >
@@ -186,17 +192,16 @@ function CustomerSelect({
               : customer.name}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
 function StatusSelect({ defaultValue }: { defaultValue?: string }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Status</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Status</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? "lead"}
         name="status"
         required
@@ -206,17 +211,16 @@ function StatusSelect({ defaultValue }: { defaultValue?: string }) {
             {statusLabels[status]}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
 function PrioritySelect({ defaultValue }: { defaultValue?: string | null }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Priority</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Priority</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? ""}
         name="priority"
       >
@@ -226,8 +230,8 @@ function PrioritySelect({ defaultValue }: { defaultValue?: string | null }) {
             {priorityLabels[priority]}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
@@ -270,15 +274,14 @@ function JobForm({
         name="scheduled_date"
         type="datetime-local"
       />
-      <label className="block sm:col-span-2">
-        <span className="text-sm font-medium text-slate-700">Address</span>
-        <input
-          className="mt-2 h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+      <Field className="sm:col-span-2">
+        <FieldLabel>Address</FieldLabel>
+        <Input
           defaultValue={fieldValue(job?.address ?? null)}
           name="address"
           type="text"
         />
-      </label>
+      </Field>
       <TextAreaField
         defaultValue={fieldValue(job?.description ?? null)}
         label="Description"
@@ -293,12 +296,10 @@ function JobForm({
 
 function EmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-950">No jobs yet</h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Create your first job and link it to a customer when needed.
-      </p>
-    </div>
+    <EmptyStateView
+      description="Create your first job and link it to a customer when needed."
+      title="No jobs yet"
+    />
   );
 }
 
@@ -315,7 +316,7 @@ function JobCard({
   const deleteJobWithId = deleteJob.bind(null, job.id);
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -327,7 +328,7 @@ function JobCard({
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+            <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
               {statusLabels[job.status]}
             </span>
             {job.priority ? (
@@ -358,7 +359,7 @@ function JobCard({
       </div>
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-md border border-slate-200 bg-slate-50 p-4">
+        <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-slate-800">
             Edit job
           </summary>
@@ -372,7 +373,7 @@ function JobCard({
           </div>
         </details>
 
-        <details className="rounded-md border border-red-200 bg-red-50 p-4">
+        <details className="rounded-lg border border-red-200 bg-red-50 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-red-800">
             Delete job
           </summary>
@@ -380,7 +381,7 @@ function JobCard({
             <p className="mb-3 text-sm text-red-700">
               This permanently removes {job.title}.
             </p>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="destructive">
               Confirm delete
             </Button>
           </form>
@@ -442,19 +443,16 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         <Message message={customersResult.error.message} tone="error" />
       ) : null}
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Add job</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Track a lead, scheduled visit, or active job.
-        </p>
-        <div className="mt-5">
-          <JobForm
-            action={createJob}
-            customers={customers}
-            submitLabel="Create job"
-          />
-        </div>
-      </div>
+      <CardSection
+        description="Track a lead, scheduled visit, or active job."
+        title="Add job"
+      >
+        <JobForm
+          action={createJob}
+          customers={customers}
+          submitLabel="Create job"
+        />
+      </CardSection>
 
       <div className="space-y-4">
         {jobs.length > 0 ? (

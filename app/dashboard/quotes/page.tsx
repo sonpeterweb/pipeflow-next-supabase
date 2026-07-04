@@ -6,6 +6,9 @@ import {
   updateQuote,
 } from "@/app/dashboard/quotes/actions";
 import { Button } from "@/components/ui/button";
+import { CardSection } from "@/components/ui/card";
+import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
+import { Field, FieldLabel, Input, Select } from "@/components/ui/form-controls";
 import { quoteStatuses } from "@/lib/quotes/validation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -107,10 +110,10 @@ function Message({
   const classes =
     tone === "error"
       ? "border-red-200 bg-red-50 text-red-700"
-      : "border-emerald-200 bg-emerald-50 text-emerald-800";
+      : "border-green-200 bg-green-50 text-green-800";
 
   return (
-    <p className={`rounded-md border px-4 py-3 text-sm font-medium ${classes}`}>
+    <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
       {message}
     </p>
   );
@@ -132,17 +135,16 @@ function TextField({
   type?: string;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <input
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>{label}</FieldLabel>
+      <Input
         defaultValue={defaultValue}
         name={name}
         required={required}
         step={step}
         type={type}
       />
-    </label>
+    </Field>
   );
 }
 
@@ -154,10 +156,9 @@ function CustomerSelect({
   defaultValue?: string | null;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Customer</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Customer</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? ""}
         name="customer_id"
       >
@@ -169,8 +170,8 @@ function CustomerSelect({
               : customer.name}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
@@ -182,10 +183,9 @@ function JobSelect({
   jobs: JobOption[];
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Job</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Job</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? ""}
         name="job_id"
       >
@@ -195,17 +195,16 @@ function JobSelect({
             {job.title}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
 function StatusSelect({ defaultValue }: { defaultValue?: string }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Status</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Status</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? "draft"}
         name="status"
         required
@@ -215,8 +214,8 @@ function StatusSelect({ defaultValue }: { defaultValue?: string }) {
             {statusLabels[status]}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
@@ -272,12 +271,10 @@ function QuoteForm({
 
 function EmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-950">No quotes yet</h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Create your first quote and link it to a customer or job when needed.
-      </p>
-    </div>
+    <EmptyStateView
+      description="Create your first quote and link it to a customer or job when needed."
+      title="No quotes yet"
+    />
   );
 }
 
@@ -299,7 +296,7 @@ function QuoteCard({
   const quoteTitle = quote.quote_number || "Untitled quote";
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div>
         <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
           <div>
@@ -311,7 +308,7 @@ function QuoteCard({
               {getJobTitle(quote.job_id, jobsById)}
             </p>
           </div>
-          <span className="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
+          <span className="w-fit rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
             {statusLabels[quote.status]}
           </span>
         </div>
@@ -333,7 +330,7 @@ function QuoteCard({
       </div>
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-md border border-slate-200 bg-slate-50 p-4">
+        <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-slate-800">
             Edit quote
           </summary>
@@ -348,7 +345,7 @@ function QuoteCard({
           </div>
         </details>
 
-        <details className="rounded-md border border-red-200 bg-red-50 p-4">
+        <details className="rounded-lg border border-red-200 bg-red-50 p-4">
           <summary className="cursor-pointer text-sm font-semibold text-red-800">
             Delete quote
           </summary>
@@ -356,7 +353,7 @@ function QuoteCard({
             <p className="mb-3 text-sm text-red-700">
               This permanently removes {quoteTitle}.
             </p>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="destructive">
               Confirm delete
             </Button>
           </form>
@@ -428,20 +425,17 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
         <Message message={jobsResult.error.message} tone="error" />
       ) : null}
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Add quote</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Create a draft or sent estimate for a customer or job.
-        </p>
-        <div className="mt-5">
-          <QuoteForm
-            action={createQuote}
-            customers={customers}
-            jobs={jobs}
-            submitLabel="Create quote"
-          />
-        </div>
-      </div>
+      <CardSection
+        description="Create a draft or sent estimate for a customer or job."
+        title="Add quote"
+      >
+        <QuoteForm
+          action={createQuote}
+          customers={customers}
+          jobs={jobs}
+          submitLabel="Create quote"
+        />
+      </CardSection>
 
       <div className="space-y-4">
         {quotes.length > 0 ? (

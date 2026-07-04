@@ -7,6 +7,7 @@ import {
   type DashboardJobMetricRow,
 } from "@/lib/dashboard/metrics";
 import { createClient } from "@/lib/supabase/server";
+import { Card, CardContent } from "@/components/ui/card";
 
 function MetricCard({
   description,
@@ -18,19 +19,21 @@ function MetricCard({
   value: string;
 }) {
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+    <Card>
+      <CardContent>
       <p className="text-sm font-medium text-slate-500">{label}</p>
       <p className="mt-3 text-3xl font-semibold text-slate-950">{value}</p>
       {description ? (
         <p className="mt-2 text-sm text-slate-500">{description}</p>
       ) : null}
-    </article>
+      </CardContent>
+    </Card>
   );
 }
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <p className="rounded-md border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+    <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
       {message}
     </p>
   );
