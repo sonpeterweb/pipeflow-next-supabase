@@ -1,12 +1,23 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Plus, Users } from "lucide-react";
 
 import {
   createCustomer,
   deleteCustomer,
   updateCustomer,
 } from "@/app/dashboard/customers/actions";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
+import {
+  ActionPanel,
+  ActionSummary,
+  CrudPageHeader,
+  CrudToolbar,
+  DetailGrid,
+  DetailItem,
+  RecordCard,
+} from "@/components/ui/crud";
 import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
 import {
   Field,
@@ -30,6 +41,7 @@ type Customer = {
 type CustomersPageProps = {
   searchParams: Promise<{
     error?: string;
+    q?: string;
     success?: string;
   }>;
 };
@@ -42,6 +54,24 @@ function formatDate(value: string) {
 
 function fieldValue(value: string | null) {
   return value ?? "";
+}
+
+function normalize(value: string | null | undefined) {
+  return (value ?? "").trim().toLowerCase();
+}
+
+function customerMatchesSearch(customer: Customer, query: string) {
+  if (!query) {
+    return true;
+  }
+
+  return [
+    customer.name,
+    customer.company_name,
+    customer.email,
+    customer.phone,
+    customer.address,
+  ].some((value) => normalize(value).includes(query));
 }
 
 function Message({
@@ -154,6 +184,8 @@ function CustomerForm({
 function EmptyState() {
   return (
     <EmptyStateView
+      action={{ href: "#new-customer", label: "Add customer" }}
+      icon={<Users aria-hidden="true" size={20} />}
       description="Add your first customer to start tracking trade work in PipeFlow."
       title="No customers yet"
     />
@@ -165,45 +197,40 @@ function CustomerCard({ customer }: { customer: Customer }) {
   const deleteCustomerWithId = deleteCustomer.bind(null, customer.id);
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-slate-950">
-            {customer.name}
-          </h2>
-          <div className="mt-3 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-3">
-            <p>
-              <span className="font-medium text-slate-800">Company:</span>{" "}
-              {customer.company_name || "Not set"}
-            </p>
-            <p>
-              <span className="font-medium text-slate-800">Email:</span>{" "}
-              {customer.email || "Not set"}
-            </p>
-            <p>
-              <span className="font-medium text-slate-800">Phone:</span>{" "}
-              {customer.phone || "Not set"}
-            </p>
-            <p className="sm:col-span-2">
-              <span className="font-medium text-slate-800">Address:</span>{" "}
-              {customer.address || "Not set"}
-            </p>
-            <p>
-              <span className="font-medium text-slate-800">Created:</span>{" "}
-              {formatDate(customer.created_at)}
-            </p>
-          </div>
-          {customer.notes ? (
-            <p className="mt-3 text-sm text-slate-600">{customer.notes}</p>
-          ) : null}
-        </div>
-      </div>
+    <RecordCard
+      actions={
+        customer.email ? (
+          <Link
+            className={buttonVariants({ className: "h-9 px-3", variant: "outline" })}
+            href={`mailto:${customer.email}`}
+          >
+            Email
+          </Link>
+        ) : null
+      }
+      meta={customer.company_name || "No company set"}
+      title={customer.name}
+    >
+      <DetailGrid>
+        <DetailItem label="Email" value={customer.email || "Not set"} />
+        <DetailItem label="Phone" value={customer.phone || "Not set"} />
+        <DetailItem
+          className="sm:col-span-2"
+          label="Address"
+          value={customer.address || "Not set"}
+        />
+        <DetailItem label="Created" value={formatDate(customer.created_at)} />
+      </DetailGrid>
+
+      {customer.notes ? (
+        <p className="mt-4 rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-600">
+          {customer.notes}
+        </p>
+      ) : null}
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
-            Edit customer
-          </summary>
+        <ActionPanel>
+          <ActionSummary>Edit customer</ActionSummary>
           <div className="mt-4">
             <CustomerForm
               action={updateCustomerWithId}
@@ -211,12 +238,10 @@ function CustomerCard({ customer }: { customer: Customer }) {
               submitLabel="Save changes"
             />
           </div>
-        </details>
+        </ActionPanel>
 
-        <details className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-red-800">
-            Delete customer
-          </summary>
+        <ActionPanel tone="danger">
+          <ActionSummary tone="danger">Delete customer</ActionSummary>
           <form action={deleteCustomerWithId} className="mt-4">
             <p className="mb-3 text-sm text-red-700">
               This removes {customer.name}. Existing linked records may keep a
@@ -226,9 +251,9 @@ function CustomerCard({ customer }: { customer: Customer }) {
               Confirm delete
             </Button>
           </form>
-        </details>
+        </ActionPanel>
       </div>
-    </article>
+    </RecordCard>
   );
 }
 
@@ -252,17 +277,25 @@ export default async function CustomersPage({
     .order("created_at", { ascending: false });
 
   const customers = (data ?? []) as Customer[];
+  const search = params.q ?? "";
+  const normalizedSearch = normalize(search);
+  const visibleCustomers = customers.filter((customer) =>
+    customerMatchesSearch(customer, normalizedSearch),
+  );
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-          Customers
-        </h1>
-        <p className="mt-2 text-slate-600">
-          Manage customer details for your plumbing and trade jobs.
-        </p>
-      </div>
+      <CrudPageHeader
+        action={
+          <Link className={buttonVariants({ className: "gap-2" })} href="#new-customer">
+            <Plus aria-hidden="true" className="size-4" />
+            New Customer
+          </Link>
+        }
+        description="Manage customer details for your plumbing and trade jobs."
+        eyebrow="CRM"
+        title="Customers"
+      />
 
       {params.error ? <Message message={params.error} tone="error" /> : null}
       {params.success ? (
@@ -271,17 +304,32 @@ export default async function CustomersPage({
       {error ? <Message message={error.message} tone="error" /> : null}
 
       <CardSection
+        className="scroll-mt-6"
         description="Store contact details for a customer or site."
         title="Add customer"
       >
-        <CustomerForm action={createCustomer} submitLabel="Create customer" />
+        <div id="new-customer">
+          <CustomerForm action={createCustomer} submitLabel="Create customer" />
+        </div>
       </CardSection>
 
+      <CrudToolbar
+        clearHref="/dashboard/customers"
+        resultLabel={`${visibleCustomers.length} of ${customers.length} customers shown`}
+        search={search}
+        searchPlaceholder="Search customers, companies, email, phone, or address"
+      />
+
       <div className="space-y-4">
-        {customers.length > 0 ? (
-          customers.map((customer) => (
+        {visibleCustomers.length > 0 ? (
+          visibleCustomers.map((customer) => (
             <CustomerCard customer={customer} key={customer.id} />
           ))
+        ) : customers.length > 0 ? (
+          <EmptyStateView
+            description="Try clearing search filters to see all customer records."
+            title="No customers match your filters"
+          />
         ) : (
           <EmptyState />
         )}

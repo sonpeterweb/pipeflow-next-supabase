@@ -1,12 +1,24 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Plus, Receipt } from "lucide-react";
 
 import {
   createInvoice,
   deleteInvoice,
   updateInvoice,
 } from "@/app/dashboard/invoices/actions";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
+import {
+  ActionPanel,
+  ActionSummary,
+  CrudPageHeader,
+  CrudToolbar,
+  DetailGrid,
+  DetailItem,
+  RecordCard,
+  StatusBadge,
+} from "@/components/ui/crud";
 import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
 import { Field, FieldLabel, Input, Select } from "@/components/ui/form-controls";
 import { invoiceStatuses } from "@/lib/invoices/validation";
@@ -40,6 +52,8 @@ type JobOption = {
 type InvoicesPageProps = {
   searchParams: Promise<{
     error?: string;
+    q?: string;
+    status?: string;
     success?: string;
   }>;
 };
@@ -52,8 +66,23 @@ const statusLabels: Record<(typeof invoiceStatuses)[number], string> = {
   cancelled: "Cancelled",
 };
 
+const statusTones: Record<
+  (typeof invoiceStatuses)[number],
+  "blue" | "green" | "amber" | "red" | "slate"
+> = {
+  cancelled: "red",
+  draft: "slate",
+  overdue: "red",
+  paid: "green",
+  sent: "blue",
+};
+
 function fieldValue(value: string | null) {
   return value ?? "";
+}
+
+function normalize(value: string | null | undefined) {
+  return (value ?? "").trim().toLowerCase();
 }
 
 function formatDate(value: string | null) {
@@ -99,6 +128,24 @@ function getJobTitle(jobId: string | null, jobsById: Map<string, JobOption>) {
   }
 
   return jobsById.get(jobId)?.title ?? "Job unavailable";
+}
+
+function invoiceMatchesSearch(
+  invoice: Invoice,
+  customersById: Map<string, CustomerOption>,
+  jobsById: Map<string, JobOption>,
+  query: string,
+) {
+  if (!query) {
+    return true;
+  }
+
+  return [
+    invoice.invoice_number,
+    getCustomerName(invoice.customer_id, customersById),
+    getJobTitle(invoice.job_id, jobsById),
+    String(invoice.amount),
+  ].some((value) => normalize(value).includes(query));
 }
 
 function Message({
@@ -279,6 +326,8 @@ function InvoiceForm({
 function EmptyState() {
   return (
     <EmptyStateView
+      action={{ href: "#new-invoice", label: "Create invoice" }}
+      icon={<Receipt aria-hidden="true" size={20} />}
       description="Create your first invoice and link it to a customer or job when needed."
       title="No invoices yet"
     />
@@ -303,48 +352,30 @@ function InvoiceCard({
   const invoiceTitle = invoice.invoice_number || "Untitled invoice";
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-950">
-              {invoiceTitle}
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              {getCustomerName(invoice.customer_id, customersById)} ·{" "}
-              {getJobTitle(invoice.job_id, jobsById)}
-            </p>
-          </div>
-          <span className="w-fit rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-            {statusLabels[invoice.status]}
-          </span>
-        </div>
-
-        <div className="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-4">
-          <p>
-            <span className="font-medium text-slate-800">Amount:</span>{" "}
-            {formatAmount(invoice.amount)}
-          </p>
-          <p>
-            <span className="font-medium text-slate-800">Issued:</span>{" "}
-            {formatDate(invoice.issued_at)}
-          </p>
-          <p>
-            <span className="font-medium text-slate-800">Due:</span>{" "}
-            {formatDate(invoice.due_at)}
-          </p>
-          <p>
-            <span className="font-medium text-slate-800">Paid:</span>{" "}
-            {formatDate(invoice.paid_at)}
-          </p>
-        </div>
-      </div>
+    <RecordCard
+      eyebrow={
+        <StatusBadge tone={statusTones[invoice.status]}>
+          {statusLabels[invoice.status]}
+        </StatusBadge>
+      }
+      meta={
+        <>
+          {getCustomerName(invoice.customer_id, customersById)} ·{" "}
+          {getJobTitle(invoice.job_id, jobsById)}
+        </>
+      }
+      title={invoiceTitle}
+    >
+      <DetailGrid>
+        <DetailItem label="Amount" value={formatAmount(invoice.amount)} />
+        <DetailItem label="Issued" value={formatDate(invoice.issued_at)} />
+        <DetailItem label="Due" value={formatDate(invoice.due_at)} />
+        <DetailItem label="Paid" value={formatDate(invoice.paid_at)} />
+      </DetailGrid>
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
-            Edit invoice
-          </summary>
+        <ActionPanel>
+          <ActionSummary>Edit invoice</ActionSummary>
           <div className="mt-4">
             <InvoiceForm
               action={updateInvoiceWithId}
@@ -354,12 +385,10 @@ function InvoiceCard({
               submitLabel="Save changes"
             />
           </div>
-        </details>
+        </ActionPanel>
 
-        <details className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-red-800">
-            Delete invoice
-          </summary>
+        <ActionPanel tone="danger">
+          <ActionSummary tone="danger">Delete invoice</ActionSummary>
           <form action={deleteInvoiceWithId} className="mt-4">
             <p className="mb-3 text-sm text-red-700">
               This permanently removes {invoiceTitle}.
@@ -368,9 +397,9 @@ function InvoiceCard({
               Confirm delete
             </Button>
           </form>
-        </details>
+        </ActionPanel>
       </div>
-    </article>
+    </RecordCard>
   );
 }
 
@@ -410,17 +439,32 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
   const jobs = (jobsResult.data ?? []) as JobOption[];
   const customersById = new Map(customers.map((customer) => [customer.id, customer]));
   const jobsById = new Map(jobs.map((job) => [job.id, job]));
+  const search = params.q ?? "";
+  const normalizedSearch = normalize(search);
+  const status =
+    params.status &&
+    invoiceStatuses.includes(params.status as (typeof invoiceStatuses)[number])
+      ? (params.status as (typeof invoiceStatuses)[number])
+      : "";
+  const visibleInvoices = invoices.filter(
+    (invoice) =>
+      invoiceMatchesSearch(invoice, customersById, jobsById, normalizedSearch) &&
+      (!status || invoice.status === status),
+  );
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-          Invoices
-        </h1>
-        <p className="mt-2 text-slate-600">
-          Manage invoice drafts, sent balances, due dates, and paid status.
-        </p>
-      </div>
+      <CrudPageHeader
+        action={
+          <Link className={buttonVariants({ className: "gap-2" })} href="#new-invoice">
+            <Plus aria-hidden="true" className="size-4" />
+            New Invoice
+          </Link>
+        }
+        description="Manage invoice drafts, sent balances, due dates, and paid status."
+        eyebrow="Finance"
+        title="Invoices"
+      />
 
       {params.error ? <Message message={params.error} tone="error" /> : null}
       {params.success ? (
@@ -437,20 +481,35 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
       ) : null}
 
       <CardSection
+        className="scroll-mt-6"
         description="Create a draft or sent invoice for a customer or job."
         title="Add invoice"
       >
-        <InvoiceForm
-          action={createInvoice}
-          customers={customers}
-          jobs={jobs}
-          submitLabel="Create invoice"
-        />
+        <div id="new-invoice">
+          <InvoiceForm
+            action={createInvoice}
+            customers={customers}
+            jobs={jobs}
+            submitLabel="Create invoice"
+          />
+        </div>
       </CardSection>
 
+      <CrudToolbar
+        clearHref="/dashboard/invoices"
+        resultLabel={`${visibleInvoices.length} of ${invoices.length} invoices shown`}
+        search={search}
+        searchPlaceholder="Search invoice number, customer, job, or amount"
+        status={status}
+        statusOptions={invoiceStatuses.map((invoiceStatus) => ({
+          label: statusLabels[invoiceStatus],
+          value: invoiceStatus,
+        }))}
+      />
+
       <div className="space-y-4">
-        {invoices.length > 0 ? (
-          invoices.map((invoice) => (
+        {visibleInvoices.length > 0 ? (
+          visibleInvoices.map((invoice) => (
             <InvoiceCard
               customers={customers}
               customersById={customersById}
@@ -460,6 +519,11 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
               key={invoice.id}
             />
           ))
+        ) : invoices.length > 0 ? (
+          <EmptyStateView
+            description="Try clearing search or status filters to see all invoice records."
+            title="No invoices match your filters"
+          />
         ) : (
           <EmptyState />
         )}

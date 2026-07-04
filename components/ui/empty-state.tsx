@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import { Inbox } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export function EmptyState({
@@ -14,7 +15,7 @@ export function EmptyState({
   icon?: ReactNode;
   title: string;
   description: string;
-  action?: { label: string; onClick?: () => void };
+  action?: { href?: string; label: string; onClick?: () => void };
   className?: string;
 }) {
   return (
@@ -33,11 +34,15 @@ export function EmptyState({
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
         {description}
       </p>
-      {action && (
+      {action?.href ? (
+        <Link className={buttonVariants({ className: "mt-5" })} href={action.href}>
+          {action.label}
+        </Link>
+      ) : action ? (
         <Button className="mt-5" onClick={action.onClick} type="button">
           {action.label}
         </Button>
-      )}
+      ) : null}
     </div>
   );
 }

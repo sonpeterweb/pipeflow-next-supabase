@@ -1,8 +1,20 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { Plus, Wrench } from "lucide-react";
 
 import { createJob, deleteJob, updateJob } from "@/app/dashboard/jobs/actions";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
+import {
+  ActionPanel,
+  ActionSummary,
+  CrudPageHeader,
+  CrudToolbar,
+  DetailGrid,
+  DetailItem,
+  RecordCard,
+  StatusBadge,
+} from "@/components/ui/crud";
 import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
 import {
   Field,
@@ -36,6 +48,8 @@ type CustomerOption = {
 type JobsPageProps = {
   searchParams: Promise<{
     error?: string;
+    q?: string;
+    status?: string;
     success?: string;
   }>;
 };
@@ -57,8 +71,52 @@ const priorityLabels: Record<(typeof jobPriorities)[number], string> = {
   urgent: "Urgent",
 };
 
+const statusTones: Record<
+  (typeof jobStatuses)[number],
+  "blue" | "green" | "amber" | "red" | "slate"
+> = {
+  cancelled: "red",
+  completed: "green",
+  in_progress: "blue",
+  lead: "slate",
+  paid: "green",
+  quoted: "amber",
+  scheduled: "blue",
+};
+
+const priorityTones: Record<
+  (typeof jobPriorities)[number],
+  "blue" | "green" | "amber" | "red" | "slate"
+> = {
+  high: "amber",
+  low: "slate",
+  medium: "blue",
+  urgent: "red",
+};
+
 function fieldValue(value: string | null) {
   return value ?? "";
+}
+
+function normalize(value: string | null | undefined) {
+  return (value ?? "").trim().toLowerCase();
+}
+
+function jobMatchesSearch(
+  job: Job,
+  customersById: Map<string, CustomerOption>,
+  query: string,
+) {
+  if (!query) {
+    return true;
+  }
+
+  return [
+    job.title,
+    job.description,
+    job.address,
+    getCustomerName(job.customer_id, customersById),
+  ].some((value) => normalize(value).includes(query));
 }
 
 function formatDate(value: string | null) {
@@ -297,6 +355,8 @@ function JobForm({
 function EmptyState() {
   return (
     <EmptyStateView
+      action={{ href: "#new-job", label: "Create job" }}
+      icon={<Wrench aria-hidden="true" size={20} />}
       description="Create your first job and link it to a customer when needed."
       title="No jobs yet"
     />
@@ -316,53 +376,40 @@ function JobCard({
   const deleteJobWithId = deleteJob.bind(null, job.id);
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-      <div>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-950">
-              {job.title}
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              {getCustomerName(job.customer_id, customersById)}
-            </p>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
-              {statusLabels[job.status]}
-            </span>
-            {job.priority ? (
-              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-                {priorityLabels[job.priority]}
-              </span>
-            ) : null}
-          </div>
-        </div>
-
-        <div className="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-3">
-          <p>
-            <span className="font-medium text-slate-800">Scheduled:</span>{" "}
-            {formatDate(job.scheduled_date)}
-          </p>
-          <p>
-            <span className="font-medium text-slate-800">Estimate:</span>{" "}
-            {formatAmount(job.estimated_amount)}
-          </p>
-          <p className="sm:col-span-2">
-            <span className="font-medium text-slate-800">Address:</span>{" "}
-            {job.address || "Not set"}
-          </p>
-        </div>
-        {job.description ? (
-          <p className="mt-3 text-sm text-slate-600">{job.description}</p>
-        ) : null}
-      </div>
+    <RecordCard
+      eyebrow={
+        <>
+          <StatusBadge tone={statusTones[job.status]}>
+            {statusLabels[job.status]}
+          </StatusBadge>
+          {job.priority ? (
+            <StatusBadge tone={priorityTones[job.priority]}>
+              {priorityLabels[job.priority]} priority
+            </StatusBadge>
+          ) : null}
+        </>
+      }
+      meta={getCustomerName(job.customer_id, customersById)}
+      title={job.title}
+    >
+      <DetailGrid>
+        <DetailItem label="Scheduled" value={formatDate(job.scheduled_date)} />
+        <DetailItem label="Estimate" value={formatAmount(job.estimated_amount)} />
+        <DetailItem
+          className="sm:col-span-2"
+          label="Address"
+          value={job.address || "Not set"}
+        />
+      </DetailGrid>
+      {job.description ? (
+        <p className="mt-4 rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-600">
+          {job.description}
+        </p>
+      ) : null}
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
-            Edit job
-          </summary>
+        <ActionPanel>
+          <ActionSummary>Edit job</ActionSummary>
           <div className="mt-4">
             <JobForm
               action={updateJobWithId}
@@ -371,12 +418,10 @@ function JobCard({
               submitLabel="Save changes"
             />
           </div>
-        </details>
+        </ActionPanel>
 
-        <details className="rounded-lg border border-red-200 bg-red-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-red-800">
-            Delete job
-          </summary>
+        <ActionPanel tone="danger">
+          <ActionSummary tone="danger">Delete job</ActionSummary>
           <form action={deleteJobWithId} className="mt-4">
             <p className="mb-3 text-sm text-red-700">
               This permanently removes {job.title}.
@@ -385,9 +430,9 @@ function JobCard({
               Confirm delete
             </Button>
           </form>
-        </details>
+        </ActionPanel>
       </div>
-    </article>
+    </RecordCard>
   );
 }
 
@@ -420,17 +465,31 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
   const jobs = (jobsResult.data ?? []) as Job[];
   const customers = (customersResult.data ?? []) as CustomerOption[];
   const customersById = new Map(customers.map((customer) => [customer.id, customer]));
+  const search = params.q ?? "";
+  const normalizedSearch = normalize(search);
+  const status =
+    params.status && jobStatuses.includes(params.status as (typeof jobStatuses)[number])
+      ? (params.status as (typeof jobStatuses)[number])
+      : "";
+  const visibleJobs = jobs.filter(
+    (job) =>
+      jobMatchesSearch(job, customersById, normalizedSearch) &&
+      (!status || job.status === status),
+  );
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-          Jobs
-        </h1>
-        <p className="mt-2 text-slate-600">
-          Manage job details, status, scheduling, and customer links.
-        </p>
-      </div>
+      <CrudPageHeader
+        action={
+          <Link className={buttonVariants({ className: "gap-2" })} href="#new-job">
+            <Plus aria-hidden="true" className="size-4" />
+            New Job
+          </Link>
+        }
+        description="Manage job details, status, scheduling, and customer links."
+        eyebrow="Operations"
+        title="Jobs"
+      />
 
       {params.error ? <Message message={params.error} tone="error" /> : null}
       {params.success ? (
@@ -444,19 +503,34 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
       ) : null}
 
       <CardSection
+        className="scroll-mt-6"
         description="Track a lead, scheduled visit, or active job."
         title="Add job"
       >
-        <JobForm
-          action={createJob}
-          customers={customers}
-          submitLabel="Create job"
-        />
+        <div id="new-job">
+          <JobForm
+            action={createJob}
+            customers={customers}
+            submitLabel="Create job"
+          />
+        </div>
       </CardSection>
 
+      <CrudToolbar
+        clearHref="/dashboard/jobs"
+        resultLabel={`${visibleJobs.length} of ${jobs.length} jobs shown`}
+        search={search}
+        searchPlaceholder="Search jobs, customers, descriptions, or addresses"
+        status={status}
+        statusOptions={jobStatuses.map((jobStatus) => ({
+          label: statusLabels[jobStatus],
+          value: jobStatus,
+        }))}
+      />
+
       <div className="space-y-4">
-        {jobs.length > 0 ? (
-          jobs.map((job) => (
+        {visibleJobs.length > 0 ? (
+          visibleJobs.map((job) => (
             <JobCard
               customers={customers}
               customersById={customersById}
@@ -464,6 +538,11 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
               key={job.id}
             />
           ))
+        ) : jobs.length > 0 ? (
+          <EmptyStateView
+            description="Try clearing search or status filters to see all job records."
+            title="No jobs match your filters"
+          />
         ) : (
           <EmptyState />
         )}
