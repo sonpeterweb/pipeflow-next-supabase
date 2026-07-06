@@ -1,11 +1,26 @@
 import { redirect } from "next/navigation";
+import Link from "next/link";
+import { FileText, Plus } from "lucide-react";
 
 import {
   createQuote,
   deleteQuote,
   updateQuote,
 } from "@/app/dashboard/quotes/actions";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { CardSection } from "@/components/ui/card";
+import {
+  ActionPanel,
+  ActionSummary,
+  CrudPageHeader,
+  CrudToolbar,
+  DetailGrid,
+  DetailItem,
+  RecordCard,
+  StatusBadge,
+} from "@/components/ui/crud";
+import { EmptyState as EmptyStateView } from "@/components/ui/empty-state";
+import { Field, FieldLabel, Input, Select } from "@/components/ui/form-controls";
 import { quoteStatuses } from "@/lib/quotes/validation";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,6 +51,8 @@ type JobOption = {
 type QuotesPageProps = {
   searchParams: Promise<{
     error?: string;
+    q?: string;
+    status?: string;
     success?: string;
   }>;
 };
@@ -48,8 +65,23 @@ const statusLabels: Record<(typeof quoteStatuses)[number], string> = {
   expired: "Expired",
 };
 
+const statusTones: Record<
+  (typeof quoteStatuses)[number],
+  "blue" | "green" | "amber" | "red" | "slate"
+> = {
+  accepted: "green",
+  declined: "red",
+  draft: "slate",
+  expired: "amber",
+  sent: "blue",
+};
+
 function fieldValue(value: string | null) {
   return value ?? "";
+}
+
+function normalize(value: string | null | undefined) {
+  return (value ?? "").trim().toLowerCase();
 }
 
 function formatDate(value: string | null) {
@@ -97,6 +129,24 @@ function getJobTitle(jobId: string | null, jobsById: Map<string, JobOption>) {
   return jobsById.get(jobId)?.title ?? "Job unavailable";
 }
 
+function quoteMatchesSearch(
+  quote: Quote,
+  customersById: Map<string, CustomerOption>,
+  jobsById: Map<string, JobOption>,
+  query: string,
+) {
+  if (!query) {
+    return true;
+  }
+
+  return [
+    quote.quote_number,
+    getCustomerName(quote.customer_id, customersById),
+    getJobTitle(quote.job_id, jobsById),
+    String(quote.amount),
+  ].some((value) => normalize(value).includes(query));
+}
+
 function Message({
   message,
   tone,
@@ -107,10 +157,10 @@ function Message({
   const classes =
     tone === "error"
       ? "border-red-200 bg-red-50 text-red-700"
-      : "border-emerald-200 bg-emerald-50 text-emerald-800";
+      : "border-green-200 bg-green-50 text-green-800";
 
   return (
-    <p className={`rounded-md border px-4 py-3 text-sm font-medium ${classes}`}>
+    <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
       {message}
     </p>
   );
@@ -132,17 +182,16 @@ function TextField({
   type?: string;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">{label}</span>
-      <input
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>{label}</FieldLabel>
+      <Input
         defaultValue={defaultValue}
         name={name}
         required={required}
         step={step}
         type={type}
       />
-    </label>
+    </Field>
   );
 }
 
@@ -154,10 +203,9 @@ function CustomerSelect({
   defaultValue?: string | null;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Customer</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Customer</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? ""}
         name="customer_id"
       >
@@ -169,8 +217,8 @@ function CustomerSelect({
               : customer.name}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
@@ -182,10 +230,9 @@ function JobSelect({
   jobs: JobOption[];
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Job</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Job</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? ""}
         name="job_id"
       >
@@ -195,17 +242,16 @@ function JobSelect({
             {job.title}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
 function StatusSelect({ defaultValue }: { defaultValue?: string }) {
   return (
-    <label className="block">
-      <span className="text-sm font-medium text-slate-700">Status</span>
-      <select
-        className="mt-2 h-10 w-full rounded-md border border-slate-300 bg-white px-3 text-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
+    <Field>
+      <FieldLabel>Status</FieldLabel>
+      <Select
         defaultValue={defaultValue ?? "draft"}
         name="status"
         required
@@ -215,8 +261,8 @@ function StatusSelect({ defaultValue }: { defaultValue?: string }) {
             {statusLabels[status]}
           </option>
         ))}
-      </select>
-    </label>
+      </Select>
+    </Field>
   );
 }
 
@@ -272,12 +318,12 @@ function QuoteForm({
 
 function EmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-      <h2 className="text-lg font-semibold text-slate-950">No quotes yet</h2>
-      <p className="mt-2 text-sm text-slate-600">
-        Create your first quote and link it to a customer or job when needed.
-      </p>
-    </div>
+    <EmptyStateView
+      action={{ href: "#new-quote", label: "Create quote" }}
+      icon={<FileText aria-hidden="true" size={20} />}
+      description="Create your first quote and link it to a customer or job when needed."
+      title="No quotes yet"
+    />
   );
 }
 
@@ -299,44 +345,29 @@ function QuoteCard({
   const quoteTitle = quote.quote_number || "Untitled quote";
 
   return (
-    <article className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-      <div>
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-slate-950">
-              {quoteTitle}
-            </h2>
-            <p className="mt-1 text-sm text-slate-600">
-              {getCustomerName(quote.customer_id, customersById)} ·{" "}
-              {getJobTitle(quote.job_id, jobsById)}
-            </p>
-          </div>
-          <span className="w-fit rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-800">
-            {statusLabels[quote.status]}
-          </span>
-        </div>
-
-        <div className="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-2 xl:grid-cols-3">
-          <p>
-            <span className="font-medium text-slate-800">Amount:</span>{" "}
-            {formatAmount(quote.amount)}
-          </p>
-          <p>
-            <span className="font-medium text-slate-800">Issued:</span>{" "}
-            {formatDate(quote.issued_at)}
-          </p>
-          <p>
-            <span className="font-medium text-slate-800">Accepted:</span>{" "}
-            {formatDate(quote.accepted_at)}
-          </p>
-        </div>
-      </div>
+    <RecordCard
+      eyebrow={
+        <StatusBadge tone={statusTones[quote.status]}>
+          {statusLabels[quote.status]}
+        </StatusBadge>
+      }
+      meta={
+        <>
+          {getCustomerName(quote.customer_id, customersById)} ·{" "}
+          {getJobTitle(quote.job_id, jobsById)}
+        </>
+      }
+      title={quoteTitle}
+    >
+      <DetailGrid>
+        <DetailItem label="Amount" value={formatAmount(quote.amount)} />
+        <DetailItem label="Issued" value={formatDate(quote.issued_at)} />
+        <DetailItem label="Accepted" value={formatDate(quote.accepted_at)} />
+      </DetailGrid>
 
       <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
-        <details className="rounded-md border border-slate-200 bg-slate-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-slate-800">
-            Edit quote
-          </summary>
+        <ActionPanel>
+          <ActionSummary>Edit quote</ActionSummary>
           <div className="mt-4">
             <QuoteForm
               action={updateQuoteWithId}
@@ -346,23 +377,21 @@ function QuoteCard({
               submitLabel="Save changes"
             />
           </div>
-        </details>
+        </ActionPanel>
 
-        <details className="rounded-md border border-red-200 bg-red-50 p-4">
-          <summary className="cursor-pointer text-sm font-semibold text-red-800">
-            Delete quote
-          </summary>
+        <ActionPanel tone="danger">
+          <ActionSummary tone="danger">Delete quote</ActionSummary>
           <form action={deleteQuoteWithId} className="mt-4">
             <p className="mb-3 text-sm text-red-700">
               This permanently removes {quoteTitle}.
             </p>
-            <Button type="submit" variant="secondary">
+            <Button type="submit" variant="destructive">
               Confirm delete
             </Button>
           </form>
-        </details>
+        </ActionPanel>
       </div>
-    </article>
+    </RecordCard>
   );
 }
 
@@ -402,17 +431,31 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
   const jobs = (jobsResult.data ?? []) as JobOption[];
   const customersById = new Map(customers.map((customer) => [customer.id, customer]));
   const jobsById = new Map(jobs.map((job) => [job.id, job]));
+  const search = params.q ?? "";
+  const normalizedSearch = normalize(search);
+  const status =
+    params.status && quoteStatuses.includes(params.status as (typeof quoteStatuses)[number])
+      ? (params.status as (typeof quoteStatuses)[number])
+      : "";
+  const visibleQuotes = quotes.filter(
+    (quote) =>
+      quoteMatchesSearch(quote, customersById, jobsById, normalizedSearch) &&
+      (!status || quote.status === status),
+  );
 
   return (
     <section className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">
-          Quotes
-        </h1>
-        <p className="mt-2 text-slate-600">
-          Manage quote drafts, sent estimates, and acceptance status.
-        </p>
-      </div>
+      <CrudPageHeader
+        action={
+          <Link className={buttonVariants({ className: "gap-2" })} href="#new-quote">
+            <Plus aria-hidden="true" className="size-4" />
+            New Quote
+          </Link>
+        }
+        description="Manage quote drafts, sent estimates, and acceptance status."
+        eyebrow="Sales"
+        title="Quotes"
+      />
 
       {params.error ? <Message message={params.error} tone="error" /> : null}
       {params.success ? (
@@ -428,12 +471,12 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
         <Message message={jobsResult.error.message} tone="error" />
       ) : null}
 
-      <div className="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 className="text-lg font-semibold text-slate-950">Add quote</h2>
-        <p className="mt-1 text-sm text-slate-600">
-          Create a draft or sent estimate for a customer or job.
-        </p>
-        <div className="mt-5">
+      <CardSection
+        className="scroll-mt-6"
+        description="Create a draft or sent estimate for a customer or job."
+        title="Add quote"
+      >
+        <div id="new-quote">
           <QuoteForm
             action={createQuote}
             customers={customers}
@@ -441,11 +484,23 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
             submitLabel="Create quote"
           />
         </div>
-      </div>
+      </CardSection>
+
+      <CrudToolbar
+        clearHref="/dashboard/quotes"
+        resultLabel={`${visibleQuotes.length} of ${quotes.length} quotes shown`}
+        search={search}
+        searchPlaceholder="Search quote number, customer, job, or amount"
+        status={status}
+        statusOptions={quoteStatuses.map((quoteStatus) => ({
+          label: statusLabels[quoteStatus],
+          value: quoteStatus,
+        }))}
+      />
 
       <div className="space-y-4">
-        {quotes.length > 0 ? (
-          quotes.map((quote) => (
+        {visibleQuotes.length > 0 ? (
+          visibleQuotes.map((quote) => (
             <QuoteCard
               customers={customers}
               customersById={customersById}
@@ -455,6 +510,11 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
               quote={quote}
             />
           ))
+        ) : quotes.length > 0 ? (
+          <EmptyStateView
+            description="Try clearing search or status filters to see all quote records."
+            title="No quotes match your filters"
+          />
         ) : (
           <EmptyState />
         )}

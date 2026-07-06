@@ -18,7 +18,7 @@ export default function LoginPage() {
 
       <p className="mt-6 text-center text-sm text-slate-600">
         New to PipeFlow?{" "}
-        <Link className="font-semibold text-emerald-700" href="/signup">
+        <Link className="font-semibold text-brand-primary" href="/signup">
           Create an account
         </Link>
       </p>
