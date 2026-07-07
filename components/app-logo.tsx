@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 
 export function AppLogo({
   className,
-  variant = "light",
+  variant = "auto",
 }: {
   className?: string;
   variant?: "auto" | "dark" | "light";

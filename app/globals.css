@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f8fafc;
   --foreground: #0f172a;
@@ -10,6 +12,18 @@
   --brand-warning: #d97706;
   --brand-danger: #dc2626;
   --brand-info: #2563eb;
+}
+
+.dark {
+  --background: #020617;
+  --foreground: #e2e8f0;
+  --brand-primary: #60a5fa;
+  --brand-primary-hover: #93c5fd;
+  --brand-primary-light: #172554;
+  --brand-success: #4ade80;
+  --brand-warning: #fbbf24;
+  --brand-danger: #f87171;
+  --brand-info: #60a5fa;
 }
 
 @theme inline {
@@ -35,6 +49,11 @@ body {
 ::selection {
   background: var(--brand-primary-light);
   color: #1e3a8a;
+}
+
+.dark ::selection {
+  background: #1e40af;
+  color: #dbeafe;
 }
 
 button,
