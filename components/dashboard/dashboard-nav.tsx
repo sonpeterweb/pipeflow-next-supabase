@@ -48,9 +48,9 @@ export function DashboardNav() {
             aria-current={active ? "page" : undefined}
             className={cn(
               "inline-flex h-10 whitespace-nowrap rounded-lg px-3 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-primary focus-visible:ring-offset-2",
-              "items-center gap-2 text-slate-700 hover:bg-slate-100 hover:text-slate-950",
+              "items-center gap-2 text-slate-700 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-900 dark:hover:text-slate-100 dark:focus-visible:ring-offset-slate-950",
               active &&
-                "bg-brand-primary-light text-brand-primary shadow-sm hover:bg-brand-primary-light hover:text-brand-primary",
+                "bg-brand-primary-light text-brand-primary shadow-sm hover:bg-brand-primary-light hover:text-brand-primary dark:bg-blue-950 dark:text-blue-300 dark:hover:bg-blue-950 dark:hover:text-blue-300",
             )}
             href={item.href}
             key={item.href}

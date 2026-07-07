@@ -43,19 +43,21 @@ function MetricCard({
   value: string;
 }) {
   const toneClasses = {
-    amber: "bg-amber-50 text-amber-700",
-    blue: "bg-brand-primary-light text-brand-primary",
-    green: "bg-green-50 text-green-700",
-    slate: "bg-slate-100 text-slate-700",
+    amber: "bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300",
+    blue: "bg-brand-primary-light text-brand-primary dark:bg-blue-950 dark:text-blue-300",
+    green: "bg-green-50 text-green-700 dark:bg-green-950/70 dark:text-green-300",
+    slate: "bg-slate-100 text-slate-700 dark:bg-slate-900 dark:text-slate-300",
   };
   const TrendIcon = trend?.direction === "down" ? ArrowDownRight : ArrowUpRight;
 
   return (
-    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300">
+    <article className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 dark:border-slate-800 dark:bg-slate-950 dark:hover:border-slate-700">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <p className="text-sm font-medium text-slate-500">{label}</p>
-          <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950">
+          <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+            {label}
+          </p>
+          <p className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
             {value}
           </p>
         </div>
@@ -69,15 +71,17 @@ function MetricCard({
         </div>
       </div>
       {description ? (
-        <p className="mt-3 text-sm leading-6 text-slate-500">{description}</p>
+        <p className="mt-3 text-sm leading-6 text-slate-500 dark:text-slate-400">
+          {description}
+        </p>
       ) : null}
       {trend ? (
         <div
           className={cn(
             "mt-4 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold",
             trend.direction === "down"
-              ? "bg-red-50 text-red-700"
-              : "bg-green-50 text-green-700",
+              ? "bg-red-50 text-red-700 dark:bg-red-950/70 dark:text-red-300"
+              : "bg-green-50 text-green-700 dark:bg-green-950/70 dark:text-green-300",
           )}
         >
           <TrendIcon aria-hidden="true" className="size-3.5" />
@@ -90,7 +94,7 @@ function MetricCard({
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <p className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+    <p className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
       {message}
     </p>
   );
@@ -118,10 +122,10 @@ function ProgressRow({
   return (
     <div>
       <div className="mb-2 flex items-center justify-between gap-4 text-sm">
-        <span className="font-medium text-slate-700">{label}</span>
-        <span className="font-semibold text-slate-950">{value}</span>
+        <span className="font-medium text-slate-700 dark:text-slate-300">{label}</span>
+        <span className="font-semibold text-slate-950 dark:text-slate-100">{value}</span>
       </div>
-      <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+      <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-900">
         <div
           className={cn("h-full rounded-full", color)}
           style={{ width: `${Math.max(width, 4)}%` }}
@@ -200,10 +204,10 @@ export default async function DashboardPage() {
           <p className="text-sm font-semibold uppercase tracking-wide text-brand-primary">
             Dashboard
           </p>
-          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 sm:text-4xl">
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100 sm:text-4xl">
             Business overview
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600">
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
             Live overview of customers, jobs, invoices, and revenue signals for
             your PipeFlow workspace.
           </p>
@@ -300,7 +304,7 @@ export default async function DashboardPage() {
               width={percent(metrics.estimatedRevenue, totalRevenueSignal)}
             />
             <ProgressRow
-              color="bg-amber-500"
+              color="bg-amber-500 dark:bg-amber-400"
               label="Outstanding invoices"
               value={formatCurrency(metrics.outstandingInvoices)}
               width={percent(metrics.outstandingInvoices, totalRevenueSignal)}
@@ -320,26 +324,28 @@ export default async function DashboardPage() {
           title="Job mix"
         >
           <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-sm font-medium text-slate-500">Active share</p>
-              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+            <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-900">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                Active share
+              </p>
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
                 {percent(metrics.activeJobs, totalJobCount)}%
               </p>
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                 <div
                   className="h-full rounded-full bg-brand-primary"
                   style={{ width: `${percent(metrics.activeJobs, totalJobCount)}%` }}
                 />
               </div>
             </div>
-            <div className="rounded-xl bg-slate-50 p-4">
-              <p className="text-sm font-medium text-slate-500">
+            <div className="rounded-xl bg-slate-50 p-4 dark:bg-slate-900">
+              <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                 Completion share
               </p>
-              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950">
+              <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
                 {percent(metrics.completedJobs, totalJobCount)}%
               </p>
-              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200">
+              <div className="mt-4 h-2 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
                 <div
                   className="h-full rounded-full bg-green-600"
                   style={{
@@ -421,17 +427,17 @@ export default async function DashboardPage() {
           <div className="space-y-4">
             {activityItems.map((item) => (
               <div className="flex gap-3" key={item.title}>
-                <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600">
+                <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 dark:bg-slate-900 dark:text-slate-400">
                   {item.icon}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-                    <p className="font-medium text-slate-950">{item.title}</p>
-                    <time className="text-xs font-medium uppercase tracking-wide text-slate-400">
+                    <p className="font-medium text-slate-950 dark:text-slate-100">{item.title}</p>
+                    <time className="text-xs font-medium uppercase tracking-wide text-slate-400 dark:text-slate-500">
                       {item.timestamp}
                     </time>
                   </div>
-                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                  <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-400">
                     {item.description}
                   </p>
                 </div>

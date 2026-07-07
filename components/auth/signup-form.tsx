@@ -51,7 +51,7 @@ export function SignupForm() {
         />
       </Field>
       {state.message ? (
-        <p className="rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700">
+        <p className="rounded-lg bg-red-50 dark:bg-red-950/40 px-3 py-2 text-sm font-medium text-red-700 dark:text-red-300">
           {state.message}
         </p>
       ) : null}
