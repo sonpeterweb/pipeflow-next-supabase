@@ -507,7 +507,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="px-5 pb-16 sm:pb-20">
+        <section className="px-5 py-16 sm:py-20">
           <div className="mx-auto max-w-7xl rounded-2xl bg-slate-950 p-8 text-white shadow-md dark:bg-slate-900 sm:p-10 lg:p-12">
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>
