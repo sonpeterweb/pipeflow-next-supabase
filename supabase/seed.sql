@@ -11,10 +11,9 @@
 -- 18 Halsey Street, Wynyard Quarter, Auckland 1010
 --
 -- Before running:
--- 1. Create a demo user through the app signup flow.
--- 2. Find that user's id in Supabase:
---    select id, email from auth.users order by created_at desc;
--- 3. Replace the placeholder demo_user_id below with the demo user's auth id.
+-- 1. Create a demo user through the app signup flow using:
+--    demo@harbourplumbing.co.nz
+-- 2. Run this file from top to bottom in Supabase SQL Editor.
 --
 -- Reset/reseed strategy:
 -- Rerunning this file deletes existing customers, jobs, quotes, and invoices
@@ -22,15 +21,19 @@
 
 do $$
 declare
-  demo_user_id uuid := '00000000-0000-0000-0000-000000000000';
+  demo_user_email text := 'demo@harbourplumbing.co.nz';
+  demo_user_id uuid;
   anchor_date timestamptz := '2026-07-09 09:00:00+12';
 begin
-  if demo_user_id = '00000000-0000-0000-0000-000000000000' then
-    raise exception 'Replace demo_user_id in supabase/seed.sql with an id from auth.users before running.';
-  end if;
+  select id
+  into demo_user_id
+  from auth.users
+  where lower(email) = demo_user_email
+  order by created_at desc
+  limit 1;
 
-  if not exists (select 1 from auth.users where id = demo_user_id) then
-    raise exception 'No auth.users row found for demo_user_id %. Create a demo user first.', demo_user_id;
+  if demo_user_id is null then
+    raise exception 'No auth.users row found for %. Create that demo user before running supabase/seed.sql.', demo_user_email;
   end if;
 
   insert into public.profiles (id, email, full_name, company_name)
@@ -63,11 +66,11 @@ begin
     ('10000000-0000-0000-0000-000000000001', demo_user_id, 'Amelia Fraser', null, 'amelia.fraser@xtra.co.nz', '021 742 118', '42 Valley Road, Mt Eden, Auckland 1024', 'Older villa with mixed copper and PEX pipework. Text before arrival if access time changes.', anchor_date - interval '104 days'),
     ('10000000-0000-0000-0000-000000000002', demo_user_id, 'James Whitaker', null, 'james.whitaker@icloud.com', '027 391 6652', '18 Summer Street, Ponsonby, Auckland 1011', 'Renovating the kitchen first, ensuite later. Wants clear stage-by-stage pricing.', anchor_date - interval '97 days'),
     ('10000000-0000-0000-0000-000000000003', demo_user_id, 'Mereana Thompson', null, 'mereana.thompson@gmail.com', '021 508 443', '77 Lake Road, Takapuna, Auckland 0622', 'Family home close to the coast; check external fittings for corrosion during visits.', anchor_date - interval '91 days'),
-    ('10000000-0000-0000-0000-000000000004', demo_user_id, 'Oliver Singh', null, 'oliver.singh@outlook.co.nz', '021 884 305', 'Rental owner. Include property address and tenant access notes on invoices.', anchor_date - interval '88 days'),
+    ('10000000-0000-0000-0000-000000000004', demo_user_id, 'Oliver Singh', null, 'oliver.singh@outlook.co.nz', '021 884 305', '9 Rathgar Road, Henderson, Auckland 0610', 'Rental owner. Include property address and tenant access notes on invoices.', anchor_date - interval '88 days'),
     ('10000000-0000-0000-0000-000000000005', demo_user_id, 'Hannah Liu', null, 'hannah.liu@gmail.com', '022 165 7789', '31 Kinross Street, New Lynn, Auckland 0600', 'Prefers photos before walls or cabinets are closed up.', anchor_date - interval '83 days'),
-    ('10000000-0000-0000-0000-000000000006', demo_user_id, 'Daniel Roberts', null, 'dan.roberts@icloud.com', '021 692 014', 'Two-storey home with previous pressure issues upstairs.', anchor_date - interval '79 days'),
-    ('10000000-0000-0000-0000-000000000007', demo_user_id, 'Priya Nair', null, 'priya.nair@outlook.com', '021 733 519', 'Usually available after 3pm. Young child at home, so keep noisy work to short windows where possible.', anchor_date - interval '75 days'),
-    ('10000000-0000-0000-0000-000000000008', demo_user_id, 'Grace Campbell', null, 'grace.campbell@xtra.co.nz', '027 640 2121', 'Planning a bathroom upgrade later this year; useful to flag ageing valves during callouts.', anchor_date - interval '70 days'),
+    ('10000000-0000-0000-0000-000000000006', demo_user_id, 'Daniel Roberts', null, 'dan.roberts@icloud.com', '021 692 014', '15 Millhouse Drive, Howick, Auckland 2014', 'Two-storey home with previous pressure issues upstairs.', anchor_date - interval '79 days'),
+    ('10000000-0000-0000-0000-000000000007', demo_user_id, 'Priya Nair', null, 'priya.nair@outlook.com', '021 733 519', '56 Chapel Road, Botany, Auckland 2016', 'Usually available after 3pm. Young child at home, so keep noisy work to short windows where possible.', anchor_date - interval '75 days'),
+    ('10000000-0000-0000-0000-000000000008', demo_user_id, 'Grace Campbell', null, 'grace.campbell@xtra.co.nz', '027 640 2121', '22 Coronation Road, Hillcrest, Auckland 0627', 'Planning a bathroom upgrade later this year; useful to flag ageing valves during callouts.', anchor_date - interval '70 days'),
     ('10000000-0000-0000-0000-000000000009', demo_user_id, 'Auckland Property Partners', 'Auckland Property Partners Ltd', 'maintenance@appartners.co.nz', '09 303 8142', 'Level 3, 125 Queen Street, Auckland 1010', 'Property manager with multiple CBD apartments. Requires purchase order on invoices.', anchor_date - interval '67 days'),
     ('10000000-0000-0000-0000-000000000010', demo_user_id, 'Harbour View Apartments Body Corporate', 'Harbour View Apartments BC', 'committee@harbourviewbc.co.nz', '09 489 2207', '6 Byron Avenue, Takapuna, Auckland 0622', 'Body corporate contact. Site access via building manager between 8am and 4pm.', anchor_date - interval '63 days'),
     ('10000000-0000-0000-0000-000000000011', demo_user_id, 'Kauri Property Management', 'Kauri Property Management Ltd', 'repairs@kauripm.co.nz', '09 836 4581', '4 Trading Place, Henderson, Auckland 0612', 'High-volume rental maintenance client. Prefers weekly invoice batch.', anchor_date - interval '58 days'),
