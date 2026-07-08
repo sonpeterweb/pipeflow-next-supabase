@@ -39,9 +39,17 @@ type SettingsSectionProps = {
 
 type ToggleRowProps = {
   checked?: boolean;
+  control?: React.ReactNode;
   description: string;
   disabled?: boolean;
-  label: string;
+  title: string;
+};
+
+type DangerActionProps = {
+  actionLabel: string;
+  description: string;
+  risk: string;
+  title: string;
 };
 
 function SettingsSection({
@@ -70,7 +78,7 @@ function SettingsGrid({ children }: { children: React.ReactNode }) {
   return <div className="grid gap-4 sm:grid-cols-2">{children}</div>;
 }
 
-function SectionFooter({ children }: { children: React.ReactNode }) {
+function SettingsFooter({ children }: { children: React.ReactNode }) {
   return (
     <div className="mt-6 flex flex-col gap-3 border-t border-slate-200 pt-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
       {children}
@@ -78,11 +86,41 @@ function SectionFooter({ children }: { children: React.ReactNode }) {
   );
 }
 
-function ToggleRow({
+function ComingSoonBadge() {
+  return (
+    <span className="inline-flex w-fit items-center rounded-full bg-brand-primary-light px-2.5 py-1 text-xs font-semibold text-brand-primary ring-1 ring-inset ring-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:ring-blue-900">
+      Coming Soon
+    </span>
+  );
+}
+
+function PlaceholderSave({
+  children,
+  variant = "primary",
+}: {
+  children: React.ReactNode;
+  variant?: "outline" | "primary";
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-3">
+      <ComingSoonBadge />
+      <Button
+        disabled
+        type="button"
+        variant={variant === "outline" ? "outline" : "primary"}
+      >
+        {children}
+      </Button>
+    </div>
+  );
+}
+
+function NotificationSetting({
   checked = false,
+  control,
   description,
   disabled = true,
-  label,
+  title,
 }: ToggleRowProps) {
   return (
     <label
@@ -93,19 +131,21 @@ function ToggleRow({
     >
       <span>
         <span className="block text-sm font-semibold text-slate-950 dark:text-slate-100">
-          {label}
+          {title}
         </span>
         <span className="mt-1 block text-sm leading-6 text-slate-500 dark:text-slate-400">
           {description}
         </span>
       </span>
-      <input
-        checked={checked}
-        className="mt-1 size-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900"
-        disabled={disabled}
-        readOnly
-        type="checkbox"
-      />
+      {control ?? (
+        <input
+          checked={checked}
+          className="mt-1 size-4 rounded border-slate-300 text-brand-primary focus:ring-brand-primary disabled:cursor-not-allowed dark:border-slate-700 dark:bg-slate-900"
+          disabled={disabled}
+          readOnly
+          type="checkbox"
+        />
+      )}
     </label>
   );
 }
@@ -115,6 +155,37 @@ function DisabledNotice({ children }: { children: React.ReactNode }) {
     <p className="text-sm leading-6 text-slate-500 dark:text-slate-400">
       {children}
     </p>
+  );
+}
+
+function DangerAction({
+  actionLabel,
+  description,
+  risk,
+  title,
+}: DangerActionProps) {
+  return (
+    <div className="rounded-xl border border-red-200 bg-white p-4 dark:border-red-900 dark:bg-slate-950">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <p className="text-sm font-semibold text-red-900 dark:text-red-200">
+            {title}
+          </p>
+          <p className="mt-1 text-sm leading-6 text-red-700 dark:text-red-300">
+            {description}
+          </p>
+          <p className="mt-2 text-sm font-medium text-red-800 dark:text-red-200">
+            {risk}
+          </p>
+        </div>
+        <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
+          <ComingSoonBadge />
+          <Button disabled type="button" variant="destructive">
+            {actionLabel}
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -181,14 +252,12 @@ export default async function SettingsPage() {
             <Input disabled name="phone" placeholder="+64 9 123 4567" type="tel" />
           </Field>
         </SettingsGrid>
-        <SectionFooter>
+        <SettingsFooter>
           <DisabledNotice>
             Workspace profile persistence is not connected yet.
           </DisabledNotice>
-          <Button disabled type="button">
-            Save workspace
-          </Button>
-        </SectionFooter>
+          <PlaceholderSave>Save workspace</PlaceholderSave>
+        </SettingsFooter>
       </SettingsSection>
 
       <SettingsSection
@@ -276,35 +345,33 @@ export default async function SettingsPage() {
         title="Notifications"
       >
         <div className="grid gap-3">
-          <ToggleRow
+          <NotificationSetting
             checked
             description="Receive important account and workspace messages."
-            label="Email notifications"
+            title="Email notifications"
           />
-          <ToggleRow
+          <NotificationSetting
             checked
             description="Get notified when jobs move between operational states."
-            label="Job updates"
+            title="Job updates"
           />
-          <ToggleRow
+          <NotificationSetting
             checked
             description="Receive reminders for sent quotes and outstanding invoices."
-            label="Quote and invoice reminders"
+            title="Quote and invoice reminders"
           />
-          <ToggleRow
+          <NotificationSetting
             description="Summarize jobs, invoices, and revenue once per week."
-            label="Weekly summary"
+            title="Weekly summary"
           />
         </div>
-        <SectionFooter>
+        <SettingsFooter>
           <DisabledNotice>
             Notification preferences are UI-only until delivery settings are
             connected.
           </DisabledNotice>
-          <Button disabled type="button" variant="outline">
-            Save notifications
-          </Button>
-        </SectionFooter>
+          <PlaceholderSave variant="outline">Save notifications</PlaceholderSave>
+        </SettingsFooter>
       </SettingsSection>
 
       <SettingsSection
@@ -353,29 +420,18 @@ export default async function SettingsPage() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4 p-0">
-            <div className="rounded-xl border border-red-200 bg-white p-4 dark:border-red-900 dark:bg-slate-950">
-              <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                Delete workspace
-              </p>
-              <p className="mt-1 text-sm leading-6 text-red-700 dark:text-red-300">
-                Permanently deleting a workspace is unavailable in this demo.
-              </p>
-              <Button className="mt-4" disabled type="button" variant="destructive">
-                Delete workspace unavailable
-              </Button>
-            </div>
-            <div className="rounded-xl border border-red-200 bg-white p-4 dark:border-red-900 dark:bg-slate-950">
-              <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-                Delete account
-              </p>
-              <p className="mt-1 text-sm leading-6 text-red-700 dark:text-red-300">
-                Account deletion requires a dedicated secure flow and is not
-                connected here.
-              </p>
-              <Button className="mt-4" disabled type="button" variant="destructive">
-                Delete account unavailable
-              </Button>
-            </div>
+            <DangerAction
+              actionLabel="Delete workspace"
+              description="Remove workspace settings, records, and team access when a secure backend flow exists."
+              risk="This action cannot be undone."
+              title="Delete workspace"
+            />
+            <DangerAction
+              actionLabel="Delete account"
+              description="Close the signed-in account and revoke access to PipeFlow."
+              risk="This would permanently remove account access."
+              title="Delete account"
+            />
           </CardContent>
         </div>
       </Card>
