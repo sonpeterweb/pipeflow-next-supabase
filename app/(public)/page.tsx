@@ -22,45 +22,45 @@ const features = [
     icon: ClipboardList,
     title: "Job Management",
     description:
-      "Track leads, scheduled work, active jobs, and completed visits without losing context.",
+      "See what needs doing today, what is scheduled next, and which jobs still need follow-up.",
   },
   {
     icon: Users,
     title: "Customer Management",
     description:
-      "Keep contact details, site notes, and customer history organized in one workspace.",
+      "Keep customer details, site notes, and job history easy to find before you head out.",
   },
   {
     icon: FileText,
     title: "Quotes",
     description:
-      "Create draft and sent quotes that stay connected to the right customer or job.",
+      "Prepare quotes that stay connected to the right customer, site, and job record.",
   },
   {
     icon: Receipt,
     title: "Invoices",
     description:
-      "Monitor sent, overdue, paid, and draft invoices so cash flow is easier to manage.",
+      "Keep draft, sent, overdue, and paid invoices visible so nothing slips through.",
   },
   {
     icon: BarChart3,
-    title: "Dashboard Analytics",
+    title: "Business Insights",
     description:
-      "See active work, outstanding invoices, and revenue signals from a focused dashboard.",
+      "Understand active work, outstanding invoices, and revenue without building reports.",
   },
   {
     icon: Smartphone,
     title: "Mobile Friendly",
     description:
-      "Use PipeFlow on site, in the van, or back at the office with responsive screens.",
+      "Check key details on site, in the van, or back at the office on any screen size.",
   },
 ];
 
 const benefits = [
-  "Save hours every week by replacing scattered spreadsheets and paperwork.",
-  "Reduce admin mistakes with customer, job, quote, and invoice records connected.",
-  "Invoice faster by keeping financial follow-up visible alongside work status.",
-  "Make better decisions with a clear view of jobs, customers, and revenue.",
+  "Finish paperwork in minutes instead of chasing notes across the day.",
+  "Know exactly what every job is worth before it turns into an invoice.",
+  "Get invoices out faster while the job details are still fresh.",
+  "Keep every customer, site, quote, and invoice in one place.",
 ];
 
 const process = [
@@ -78,6 +78,21 @@ const process = [
     icon: Receipt,
     title: "Get Paid Faster",
     description: "Turn operational work into quotes and invoices you can follow up.",
+  },
+];
+
+const pricingPlans = [
+  {
+    title: "Starter",
+    description: "For solo plumbers and small teams getting organized.",
+  },
+  {
+    title: "Professional",
+    description: "For growing plumbing businesses managing more jobs and invoices.",
+  },
+  {
+    title: "Enterprise",
+    description: "For larger teams with advanced workflows and reporting needs.",
   },
 ];
 
@@ -249,6 +264,9 @@ export default function Home() {
             <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#how-it-works">
               How it works
             </a>
+            <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#pricing">
+              Pricing
+            </a>
           </nav>
           <div className="flex items-center gap-2">
             <Link
@@ -279,11 +297,11 @@ export default function Home() {
                 Built for plumbing businesses
               </div>
               <h1 className="mt-6 text-5xl font-semibold tracking-tight text-slate-950 dark:text-slate-100 sm:text-6xl">
-                Run your plumbing business without the paperwork.
+                Spend less time on paperwork. More time on the tools.
               </h1>
               <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600 dark:text-slate-400">
-                PipeFlow helps plumbing teams manage jobs, customers, quotes,
-                and invoices from one modern workspace.
+                PipeFlow helps plumbing businesses manage customers, jobs,
+                quotes and invoices from one simple workspace.
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 <Link
@@ -306,7 +324,7 @@ export default function Home() {
                 </Link>
               </div>
               <div className="mt-8 grid gap-3 text-sm text-slate-600 dark:text-slate-400 sm:grid-cols-3">
-                {["No spreadsheets", "One workspace", "Built for trades"].map(
+                {["Less admin", "Clear job records", "Faster invoicing"].map(
                   (item) => (
                     <div className="flex items-center gap-2" key={item}>
                       <CheckCircle2
@@ -330,8 +348,8 @@ export default function Home() {
           <div className="mx-auto max-w-7xl">
             <SectionHeader
               eyebrow="Features"
-              title="Everything your plumbing workflow needs in one place."
-              description="PipeFlow keeps the operational pieces connected so your team can move from first call to paid invoice with less admin."
+              title="Practical tools for the work plumbers do every day."
+              description="PipeFlow keeps customers, jobs, quotes, invoices, and business numbers connected so admin does not slow the team down."
             />
             <div className="mt-12 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {features.map((feature) => (
@@ -348,12 +366,12 @@ export default function Home() {
                 Business value
               </p>
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100 sm:text-4xl">
-                Less admin, faster follow-up, clearer decisions.
+                Spend less time sorting admin after hours.
               </h2>
               <p className="mt-4 text-base leading-7 text-slate-600 dark:text-slate-400">
-                PipeFlow is designed around the daily reality of plumbing work:
-                changing schedules, customer details, quotes, invoices, and
-                follow-up all competing for attention.
+                PipeFlow is designed around real plumbing operations: changing
+                schedules, customer details, quotes, invoices, and follow-up all
+                competing for attention.
               </p>
             </div>
             <div className="grid gap-3">
@@ -382,8 +400,8 @@ export default function Home() {
           <div className="mx-auto max-w-7xl">
             <SectionHeader
               eyebrow="How it works"
-              title="A simple operating system for plumbing work."
-              description="Start with your customers, organize the work, and keep financial follow-up visible."
+              title="From first call to final invoice."
+              description="Add the customer, manage the job, and keep quote and invoice follow-up visible until the work is paid."
             />
             <div className="mt-12 grid gap-4 lg:grid-cols-3">
               {process.map((step, index) => {
@@ -423,20 +441,67 @@ export default function Home() {
               ))}
             </div>
             <h2 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
-              Trusted by plumbing businesses
+              Built for modern plumbing businesses.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
-              Customer stories and company logos can be added here once real
-              production testimonials are available.
+              PipeFlow is currently in active development, with more workflow,
+              reporting, and automation features coming soon.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
-              {["Customer testimonial", "Company logo", "Case study"].map((item) => (
+              {[
+                "Built for plumbing teams",
+                "Currently in active development",
+                "More features coming soon",
+              ].map((item) => (
                 <div
                   className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
                   key={item}
                 >
                   {item}
                 </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section
+          className="border-y border-slate-200 bg-slate-50 px-5 py-16 dark:border-slate-800 dark:bg-slate-900/40 sm:py-20"
+          id="pricing"
+        >
+          <div className="mx-auto max-w-7xl">
+            <SectionHeader
+              eyebrow="Pricing"
+              title="Simple pricing. Coming soon."
+              description="Pricing is being shaped around the needs of plumbing businesses, from solo operators to growing teams."
+            />
+            <div className="mt-12 grid gap-4 lg:grid-cols-3">
+              {pricingPlans.map((plan) => (
+                <article
+                  className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950"
+                  key={plan.title}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 className="text-lg font-semibold tracking-tight text-slate-950 dark:text-slate-100">
+                        {plan.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                        {plan.description}
+                      </p>
+                    </div>
+                    <span className="rounded-full bg-brand-primary-light px-2.5 py-1 text-xs font-semibold text-brand-primary ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:ring-blue-900">
+                      Coming Soon
+                    </span>
+                  </div>
+                  <div className="mt-6 rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
+                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
+                      Pricing details
+                    </p>
+                    <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
+                      Coming soon
+                    </p>
+                  </div>
+                </article>
               ))}
             </div>
           </div>
@@ -450,8 +515,8 @@ export default function Home() {
                   Ready to simplify your plumbing business?
                 </h2>
                 <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-                  Bring jobs, customers, quotes, invoices, and dashboard insights
-                  into one calm workspace.
+                  Bring customers, jobs, quotes, invoices, and follow-up into one
+                  calm workspace built for plumbers.
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
@@ -483,21 +548,27 @@ export default function Home() {
           <div>
             <AppLogo />
             <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
-              Modern business management for plumbing teams.
+              Practical business management for plumbing teams.
             </p>
           </div>
           <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium text-slate-600 dark:text-slate-400">
+            <span className="font-semibold text-slate-950 dark:text-slate-100">
+              Product
+            </span>
             <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#features">
               Features
             </a>
             <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#benefits">
-              Benefits
+              Demo
+            </a>
+            <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#pricing">
+              Pricing
             </a>
             <Link className="hover:text-slate-950 dark:hover:text-slate-100" href="/login">
               Sign In
             </Link>
             <Link className="hover:text-slate-950 dark:hover:text-slate-100" href="/signup">
-              Start Free Trial
+              Contact
             </Link>
           </div>
           <p className="text-sm text-slate-500 dark:text-slate-400">
