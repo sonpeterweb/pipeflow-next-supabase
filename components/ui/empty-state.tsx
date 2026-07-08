@@ -21,17 +21,17 @@ export function EmptyState({
   return (
     <div
       className={cn(
-        "rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm",
+        "rounded-xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm dark:border-slate-700 dark:bg-slate-950",
         className,
       )}
     >
-      <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-brand-primary-light text-brand-primary">
+      <div className="mx-auto flex size-11 items-center justify-center rounded-xl bg-brand-primary-light text-brand-primary dark:bg-blue-950 dark:text-blue-300">
         {icon ?? <Inbox aria-hidden="true" size={20} />}
       </div>
-      <h2 className="mt-4 text-lg font-semibold tracking-tight text-slate-950">
+      <h2 className="mt-4 text-lg font-semibold tracking-tight text-slate-950 dark:text-slate-100">
         {title}
       </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600">
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-600 dark:text-slate-400">
         {description}
       </p>
       {action?.href ? (

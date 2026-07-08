@@ -169,8 +169,8 @@ function Message({
 }) {
   const classes =
     tone === "error"
-      ? "border-red-200 bg-red-50 text-red-700"
-      : "border-green-200 bg-green-50 text-green-800";
+      ? "border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
+      : "border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-300";
 
   return (
     <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
@@ -402,12 +402,12 @@ function JobCard({
         />
       </DetailGrid>
       {job.description ? (
-        <p className="mt-4 rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-600">
+        <p className="mt-4 rounded-lg bg-slate-50 dark:bg-slate-900 p-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
           {job.description}
         </p>
       ) : null}
 
-      <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
+      <div className="mt-5 grid gap-4 border-t border-slate-200 dark:border-slate-800 pt-5">
         <ActionPanel>
           <ActionSummary>Edit job</ActionSummary>
           <div className="mt-4">
@@ -423,7 +423,7 @@ function JobCard({
         <ActionPanel tone="danger">
           <ActionSummary tone="danger">Delete job</ActionSummary>
           <form action={deleteJobWithId} className="mt-4">
-            <p className="mb-3 text-sm text-red-700">
+            <p className="mb-3 text-sm text-red-700 dark:text-red-300">
               This permanently removes {job.title}.
             </p>
             <Button type="submit" variant="destructive">

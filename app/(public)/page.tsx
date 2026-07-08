@@ -6,7 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 export default function Home() {
   return (
     <div className="flex min-h-full flex-col">
-      <header className="border-b border-slate-200 px-5 py-4">
+      <header className="border-b border-slate-200 dark:border-slate-800 px-5 py-4">
         <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
           <AppLogo />
           <nav className="flex items-center gap-2">
@@ -29,10 +29,10 @@ export default function Home() {
             <p className="text-sm font-semibold uppercase tracking-[0.16em] text-brand-primary">
               Local business management SaaS
             </p>
-            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-950 sm:text-5xl lg:text-6xl">
+            <h1 className="mt-5 text-4xl font-semibold tracking-tight text-slate-950 dark:text-slate-100 sm:text-5xl lg:text-6xl">
               Simple job management for plumbing businesses.
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600">
+            <p className="mt-6 max-w-xl text-lg leading-8 text-slate-600 dark:text-slate-400">
               PipeFlow helps Kiwi plumbers manage customers, jobs, quotes, and
               invoices from one protected dashboard built with Supabase.
             </p>
@@ -55,18 +55,18 @@ export default function Home() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 shadow-sm">
-            <div className="rounded-xl bg-white p-6 shadow-sm">
-              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+          <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 p-4 shadow-sm">
+            <div className="rounded-xl bg-white dark:bg-slate-950 p-6 shadow-sm">
+              <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
                 <div>
-                  <p className="text-sm font-medium text-slate-500">
+                  <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
                     Demo workspace
                   </p>
-                  <p className="text-2xl font-semibold text-slate-950">
+                  <p className="text-2xl font-semibold text-slate-950 dark:text-slate-100">
                     Live data
                   </p>
                 </div>
-                <span className="rounded-full bg-green-100 px-3 py-1 text-xs font-semibold text-green-800">
+                <span className="rounded-full bg-green-100 dark:bg-green-950/70 px-3 py-1 text-xs font-semibold text-green-800 dark:text-green-300">
                   Portfolio demo
                 </span>
               </div>
@@ -77,14 +77,14 @@ export default function Home() {
                   ["Quote follow-up", "Ponsonby", "Draft"],
                 ].map(([title, area, status]) => (
                   <div
-                    className="flex items-center justify-between rounded-lg border border-slate-200 p-3"
+                    className="flex items-center justify-between rounded-lg border border-slate-200 dark:border-slate-800 p-3"
                     key={title}
                   >
                     <div>
-                      <p className="font-medium text-slate-950">{title}</p>
-                      <p className="text-sm text-slate-500">{area}</p>
+                      <p className="font-medium text-slate-950 dark:text-slate-100">{title}</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">{area}</p>
                     </div>
-                    <p className="ml-4 whitespace-nowrap text-sm font-medium text-slate-700">
+                    <p className="ml-4 whitespace-nowrap text-sm font-medium text-slate-700 dark:text-slate-300">
                       {status}
                     </p>
                   </div>

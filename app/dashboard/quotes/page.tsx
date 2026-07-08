@@ -156,8 +156,8 @@ function Message({
 }) {
   const classes =
     tone === "error"
-      ? "border-red-200 bg-red-50 text-red-700"
-      : "border-green-200 bg-green-50 text-green-800";
+      ? "border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
+      : "border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-300";
 
   return (
     <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
@@ -365,7 +365,7 @@ function QuoteCard({
         <DetailItem label="Accepted" value={formatDate(quote.accepted_at)} />
       </DetailGrid>
 
-      <div className="mt-5 grid gap-4 border-t border-slate-200 pt-5">
+      <div className="mt-5 grid gap-4 border-t border-slate-200 dark:border-slate-800 pt-5">
         <ActionPanel>
           <ActionSummary>Edit quote</ActionSummary>
           <div className="mt-4">
@@ -382,7 +382,7 @@ function QuoteCard({
         <ActionPanel tone="danger">
           <ActionSummary tone="danger">Delete quote</ActionSummary>
           <form action={deleteQuoteWithId} className="mt-4">
-            <p className="mb-3 text-sm text-red-700">
+            <p className="mb-3 text-sm text-red-700 dark:text-red-300">
               This permanently removes {quoteTitle}.
             </p>
             <Button type="submit" variant="destructive">

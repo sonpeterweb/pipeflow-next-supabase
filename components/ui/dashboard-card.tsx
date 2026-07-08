@@ -32,7 +32,7 @@ export function DashboardCard({
       <CardHeader className="flex flex-row items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
           {icon ? (
-            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-primary-light text-brand-primary">
+            <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-brand-primary-light text-brand-primary dark:bg-blue-950 dark:text-blue-300">
               {icon}
             </div>
           ) : null}
