@@ -489,7 +489,7 @@ export default function Home() {
                         {plan.description}
                       </p>
                     </div>
-                    <span className="rounded-full bg-brand-primary-light px-2.5 py-1 text-xs font-semibold text-brand-primary ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:ring-blue-900">
+                    <span className="inline-flex h-7 items-center whitespace-nowrap rounded-full bg-brand-primary-light px-3 text-xs font-semibold text-brand-primary ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:ring-blue-900">
                       Coming Soon
                     </span>
                   </div>
@@ -522,7 +522,7 @@ export default function Home() {
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link
                   className={buttonVariants({
-                    className: "h-12 bg-white px-6 text-base text-slate-950 hover:bg-slate-100 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100",
+                    className: "h-12 px-6 text-base",
                   })}
                   href="/signup"
                 >
@@ -531,7 +531,7 @@ export default function Home() {
                 <Link
                   className={buttonVariants({
                     variant: "outline",
-                    className: "h-12 border-white/20 bg-transparent px-6 text-base text-white hover:bg-white/10 dark:border-white/20 dark:bg-transparent dark:text-white dark:hover:bg-white/10",
+                    className: "h-12 px-6 text-base",
                   })}
                   href="/dashboard"
                 >
