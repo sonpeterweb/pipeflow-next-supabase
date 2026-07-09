@@ -6,11 +6,11 @@ import {
   Globe2,
   LogOut,
   Palette,
-  ShieldAlert,
   UserCircle,
 } from "lucide-react";
 
 import { logout } from "@/app/(auth)/actions";
+import { updateWorkspaceProfile } from "@/app/dashboard/settings/actions";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -45,11 +45,11 @@ type ToggleRowProps = {
   title: string;
 };
 
-type DangerActionProps = {
-  actionLabel: string;
-  description: string;
-  risk: string;
-  title: string;
+type SettingsPageProps = {
+  searchParams: Promise<{
+    error?: string;
+    success?: string;
+  }>;
 };
 
 function SettingsSection({
@@ -82,35 +82,6 @@ function SettingsFooter({ children }: { children: React.ReactNode }) {
   return (
     <div className="mt-6 flex flex-col gap-3 border-t border-slate-200 pt-5 dark:border-slate-800 sm:flex-row sm:items-center sm:justify-between">
       {children}
-    </div>
-  );
-}
-
-function ComingSoonBadge() {
-  return (
-    <span className="inline-flex w-fit items-center rounded-full bg-brand-primary-light px-2.5 py-1 text-xs font-semibold text-brand-primary ring-1 ring-inset ring-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:ring-blue-900">
-      Coming Soon
-    </span>
-  );
-}
-
-function PlaceholderSave({
-  children,
-  variant = "primary",
-}: {
-  children: React.ReactNode;
-  variant?: "outline" | "primary";
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <ComingSoonBadge />
-      <Button
-        disabled
-        type="button"
-        variant={variant === "outline" ? "outline" : "primary"}
-      >
-        {children}
-      </Button>
     </div>
   );
 }
@@ -158,38 +129,26 @@ function DisabledNotice({ children }: { children: React.ReactNode }) {
   );
 }
 
-function DangerAction({
-  actionLabel,
-  description,
-  risk,
-  title,
-}: DangerActionProps) {
+function Message({
+  message,
+  tone,
+}: {
+  message: string;
+  tone: "error" | "success";
+}) {
+  const classes =
+    tone === "error"
+      ? "border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
+      : "border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-300";
+
   return (
-    <div className="rounded-xl border border-red-200 bg-white p-4 dark:border-red-900 dark:bg-slate-950">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-red-900 dark:text-red-200">
-            {title}
-          </p>
-          <p className="mt-1 text-sm leading-6 text-red-700 dark:text-red-300">
-            {description}
-          </p>
-          <p className="mt-2 text-sm font-medium text-red-800 dark:text-red-200">
-            {risk}
-          </p>
-        </div>
-        <div className="flex shrink-0 flex-col items-start gap-2 sm:items-end">
-          <ComingSoonBadge />
-          <Button disabled type="button" variant="destructive">
-            {actionLabel}
-          </Button>
-        </div>
-      </div>
-    </div>
+    <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
+      {message}
+    </p>
   );
 }
 
-export default async function SettingsPage() {
+export default async function SettingsPage({ searchParams }: SettingsPageProps) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -199,10 +158,22 @@ export default async function SettingsPage() {
     redirect("/login");
   }
 
+  const params = await searchParams;
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("company_name,full_name")
+    .eq("id", user.id)
+    .maybeSingle();
   const companyName =
-    typeof user.user_metadata.company_name === "string"
+    profile?.company_name ??
+    (typeof user.user_metadata.company_name === "string"
       ? user.user_metadata.company_name
-      : "PipeFlow Demo Workspace";
+      : "PipeFlow Demo Workspace");
+  const fullName =
+    profile?.full_name ??
+    (typeof user.user_metadata.full_name === "string"
+      ? user.user_metadata.full_name
+      : "");
 
   return (
     <section className="space-y-6">
@@ -214,50 +185,51 @@ export default async function SettingsPage() {
           Workspace settings
         </h1>
         <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
-          Configure the workspace experience for your plumbing business. These
-          controls are prepared for production settings without changing current
-          data or auth behavior.
+          Configure the workspace identity, regional defaults, appearance, and
+          account access for your plumbing business.
         </p>
       </div>
+
+      {params.error ? <Message message={params.error} tone="error" /> : null}
+      {params.success ? <Message message={params.success} tone="success" /> : null}
 
       <SettingsSection
         description="Basic business identity shown throughout the workspace."
         icon={<Building2 aria-hidden="true" className="size-5" />}
         title="Workspace"
       >
-        <SettingsGrid>
-          <Field>
-            <FieldLabel>Company name</FieldLabel>
-            <Input defaultValue={companyName} disabled name="companyName" />
-            <FieldHint>Loaded from your account metadata when available.</FieldHint>
-          </Field>
-          <Field>
-            <FieldLabel>Business type</FieldLabel>
-            <Select defaultValue="plumbing" disabled name="businessType">
-              <option value="plumbing">Plumbing business</option>
-              <option value="trades">Trade services</option>
-            </Select>
-          </Field>
-          <Field>
-            <FieldLabel>Website</FieldLabel>
-            <Input
-              disabled
-              name="website"
-              placeholder="https://example.co.nz"
-              type="url"
-            />
-          </Field>
-          <Field>
-            <FieldLabel>Phone number</FieldLabel>
-            <Input disabled name="phone" placeholder="+64 9 123 4567" type="tel" />
-          </Field>
-        </SettingsGrid>
-        <SettingsFooter>
-          <DisabledNotice>
-            Workspace profile persistence is not connected yet.
-          </DisabledNotice>
-          <PlaceholderSave>Save workspace</PlaceholderSave>
-        </SettingsFooter>
+        <form action={updateWorkspaceProfile}>
+          <SettingsGrid>
+            <Field>
+              <FieldLabel>Company name</FieldLabel>
+              <Input defaultValue={companyName} name="company_name" required />
+              <FieldHint>Used as the primary workspace name.</FieldHint>
+            </Field>
+            <Field>
+              <FieldLabel>Owner name</FieldLabel>
+              <Input defaultValue={fullName} name="full_name" />
+              <FieldHint>Shown in account metadata and profile records.</FieldHint>
+            </Field>
+            <Field>
+              <FieldLabel>Business type</FieldLabel>
+              <Select defaultValue="plumbing" disabled name="business_type">
+                <option value="plumbing">Plumbing business</option>
+                <option value="trades">Trade services</option>
+              </Select>
+            </Field>
+            <Field>
+              <FieldLabel>Region</FieldLabel>
+              <Input defaultValue="New Zealand" disabled name="region" />
+            </Field>
+          </SettingsGrid>
+          <SettingsFooter>
+            <DisabledNotice>
+              Profile changes are saved to Supabase and reflected across the
+              workspace.
+            </DisabledNotice>
+            <Button type="submit">Save workspace</Button>
+          </SettingsFooter>
+        </form>
       </SettingsSection>
 
       <SettingsSection
@@ -367,10 +339,9 @@ export default async function SettingsPage() {
         </div>
         <SettingsFooter>
           <DisabledNotice>
-            Notification preferences are UI-only until delivery settings are
-            connected.
+            These defaults describe the notification model this MVP is designed
+            around.
           </DisabledNotice>
-          <PlaceholderSave variant="outline">Save notifications</PlaceholderSave>
         </SettingsFooter>
       </SettingsSection>
 
@@ -389,12 +360,9 @@ export default async function SettingsPage() {
               Password management
             </p>
             <p className="mt-1 text-sm leading-6 text-slate-500 dark:text-slate-400">
-              Password reset and account security flows are not implemented in
-              this demo settings surface.
+              Account access is handled through Supabase Auth. Use sign out
+              when you are finished reviewing the workspace.
             </p>
-            <Button className="mt-4" disabled type="button" variant="outline">
-              Manage password
-            </Button>
           </div>
           <form action={logout}>
             <Button className="gap-2" type="submit" variant="outline">
@@ -404,37 +372,6 @@ export default async function SettingsPage() {
           </form>
         </div>
       </SettingsSection>
-
-      <Card className="border-red-200 bg-red-50/60 dark:border-red-900 dark:bg-red-950/30">
-        <div className="grid gap-6 p-6 lg:grid-cols-[260px_1fr]">
-          <CardHeader className="p-0">
-            <div className="flex size-10 items-center justify-center rounded-lg bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300">
-              <ShieldAlert aria-hidden="true" className="size-5" />
-            </div>
-            <CardTitle className="mt-4 text-base text-red-900 dark:text-red-200">
-              Danger Zone
-            </CardTitle>
-            <CardDescription className="text-red-700 dark:text-red-300">
-              Destructive account and workspace actions will live here when
-              backend support exists.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4 p-0">
-            <DangerAction
-              actionLabel="Delete workspace"
-              description="Remove workspace settings, records, and team access when a secure backend flow exists."
-              risk="This action cannot be undone."
-              title="Delete workspace"
-            />
-            <DangerAction
-              actionLabel="Delete account"
-              description="Close the signed-in account and revoke access to PipeFlow."
-              risk="This would permanently remove account access."
-              title="Delete account"
-            />
-          </CardContent>
-        </div>
-      </Card>
     </section>
   );
 }

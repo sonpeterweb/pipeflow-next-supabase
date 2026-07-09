@@ -9,7 +9,6 @@ import {
   Receipt,
   Smartphone,
   Sparkles,
-  Star,
   Users,
 } from "lucide-react";
 
@@ -81,18 +80,21 @@ const process = [
   },
 ];
 
-const pricingPlans = [
+const mvpScope = [
   {
-    title: "Starter",
-    description: "For solo plumbers and small teams getting organized.",
+    title: "Operational CRM",
+    description:
+      "Customer records, site notes, contact details, and linked work history in one protected workspace.",
   },
   {
-    title: "Professional",
-    description: "For growing plumbing businesses managing more jobs and invoices.",
+    title: "Job-to-cash workflow",
+    description:
+      "Jobs, quotes, and invoices stay connected so follow-up is visible from first call to payment.",
   },
   {
-    title: "Enterprise",
-    description: "For larger teams with advanced workflows and reporting needs.",
+    title: "Secure SaaS foundation",
+    description:
+      "Supabase Auth, PostgreSQL RLS, Server Actions, validation, and tests support a production-ready MVP.",
   },
 ];
 
@@ -264,8 +266,8 @@ export default function Home() {
             <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#how-it-works">
               How it works
             </a>
-            <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#pricing">
-              Pricing
+            <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#scope">
+              Scope
             </a>
           </nav>
           <div className="flex items-center gap-2">
@@ -435,26 +437,25 @@ export default function Home() {
 
         <section className="px-5 py-16 sm:py-20">
           <div className="mx-auto max-w-5xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm dark:border-slate-800 dark:bg-slate-950 sm:p-10">
-            <div className="mx-auto flex w-fit gap-1 text-amber-500" aria-label="Five stars">
-              {Array.from({ length: 5 }).map((_, index) => (
-                <Star aria-hidden="true" className="size-5 fill-current" key={index} />
-              ))}
-            </div>
-            <h2 className="mt-5 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
-              Built for modern plumbing businesses.
+            <p className="text-sm font-semibold uppercase tracking-wide text-brand-primary dark:text-blue-300">
+              Portfolio MVP
+            </p>
+            <h2 className="mt-3 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
+              Built around real field service workflows.
             </h2>
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
-              PipeFlow is currently in active development, with more workflow,
-              reporting, and automation features coming soon.
+              PipeFlow is scoped as a realistic SaaS foundation for plumbing,
+              electrical, HVAC, and other trade businesses that need customer,
+              job, quote, and invoice visibility.
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-3">
               {[
-                "Built for plumbing teams",
-                "Currently in active development",
-                "More features coming soon",
+                "Authenticated workspace",
+                "Live Supabase data",
+                "Mobile-friendly dashboard",
               ].map((item) => (
                 <div
-                  className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-4 text-sm font-medium text-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400"
+                  className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm font-semibold text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300"
                   key={item}
                 >
                   {item}
@@ -466,41 +467,29 @@ export default function Home() {
 
         <section
           className="border-y border-slate-200 bg-slate-50 px-5 py-16 dark:border-slate-800 dark:bg-slate-900/40 sm:py-20"
-          id="pricing"
+          id="scope"
         >
           <div className="mx-auto max-w-7xl">
             <SectionHeader
-              eyebrow="Pricing"
-              title="Simple pricing. Coming soon."
-              description="Pricing is being shaped around the needs of plumbing businesses, from solo operators to growing teams."
+              eyebrow="What this demo includes"
+              title="A complete MVP slice, not a static mockup."
+              description="The portfolio build covers the core product surface a client would expect before extending into payments, portals, or advanced automation."
             />
             <div className="mt-12 grid gap-4 lg:grid-cols-3">
-              {pricingPlans.map((plan) => (
+              {mvpScope.map((item) => (
                 <article
                   className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950"
-                  key={plan.title}
+                  key={item.title}
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-lg font-semibold tracking-tight text-slate-950 dark:text-slate-100">
-                        {plan.title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                        {plan.description}
-                      </p>
-                    </div>
-                    <span className="inline-flex h-7 items-center whitespace-nowrap rounded-full bg-brand-primary-light px-3 text-xs font-semibold text-brand-primary ring-1 ring-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:ring-blue-900">
-                      Coming Soon
-                    </span>
+                  <div className="flex size-10 items-center justify-center rounded-lg bg-brand-primary-light text-brand-primary dark:bg-blue-950 dark:text-blue-300">
+                    <CheckCircle2 aria-hidden="true" className="size-5" />
                   </div>
-                  <div className="mt-6 rounded-lg bg-slate-50 p-4 dark:bg-slate-900">
-                    <p className="text-sm font-medium text-slate-500 dark:text-slate-400">
-                      Pricing details
-                    </p>
-                    <p className="mt-1 text-2xl font-semibold tracking-tight text-slate-950 dark:text-slate-100">
-                      Coming soon
-                    </p>
-                  </div>
+                  <h3 className="mt-5 text-lg font-semibold tracking-tight text-slate-950 dark:text-slate-100">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm leading-6 text-slate-600 dark:text-slate-400">
+                    {item.description}
+                  </p>
                 </article>
               ))}
             </div>
@@ -561,8 +550,8 @@ export default function Home() {
             <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#benefits">
               Demo
             </a>
-            <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#pricing">
-              Pricing
+            <a className="hover:text-slate-950 dark:hover:text-slate-100" href="#scope">
+              Scope
             </a>
             <Link className="hover:text-slate-950 dark:hover:text-slate-100" href="/login">
               Sign In
