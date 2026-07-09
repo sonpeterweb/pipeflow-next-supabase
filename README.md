@@ -31,7 +31,7 @@ The goal is not just to show CRUD screens. The app is structured around the kind
 - Supabase Postgres with Row Level Security
 - Server Components and Server Actions
 - Zod validation
-- Vitest, React Testing Library, and jsdom
+- Vitest, React Testing Library, Playwright, and jsdom
 - pnpm
 
 ## Product Features
@@ -44,15 +44,17 @@ The goal is not just to show CRUD screens. The app is structured around the kind
 - Job tracking with status, priority, schedule, and customer links
 - Quote management with optional customer and job links
 - Invoice tracking with draft, sent, paid, overdue, and cancelled states
+- Persisted workspace profile settings backed by Supabase profiles
 - Settings interface for account, workspace, regional, and appearance preferences
 - SQL migration for schema, indexes, triggers, and RLS policies
 - Realistic demo seed data for local or hosted portfolio demos
-- Focused unit and validation tests
+- Focused unit, validation, and Playwright smoke tests
 
 ## Implementation Highlights
 
 - `app/` contains the Next.js App Router pages, layouts, and Server Actions.
 - `app/dashboard/*` contains the authenticated SaaS workspace.
+- `app/dashboard/settings/actions.ts` persists workspace profile changes through Supabase.
 - `lib/*/validation.ts` contains Zod schemas for form-backed resources.
 - `lib/dashboard/metrics.ts` calculates dashboard metrics from Supabase rows.
 - `lib/supabase/` contains browser, server, and proxy Supabase clients.
@@ -125,19 +127,22 @@ pnpm build    # create a production build
 pnpm start    # run the production build
 pnpm lint     # run ESLint
 pnpm test     # run Vitest tests
+pnpm test:e2e # run Playwright smoke tests
 ```
 
 ## Testing
 
-Tests are intentionally focused and lightweight for a portfolio SaaS project. They cover shared utilities, form validation, and dashboard metric calculations.
+Tests are intentionally focused and lightweight for a portfolio SaaS project. They cover shared utilities, form validation, dashboard metric calculations, and an auth/dashboard smoke flow.
 
 ```bash
 pnpm test
+pnpm test:e2e
 ```
 
 Current verification:
 
 - `pnpm test`
+- `pnpm test:e2e`
 - `pnpm lint`
 - `pnpm build`
 
@@ -158,7 +163,6 @@ This project reflects how I build modern business applications for real clients:
 
 Potential future work:
 
-- Persist workspace settings
 - Recent activity timeline on the dashboard
 - Role-based teams
 - Quote and invoice PDF generation
