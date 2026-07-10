@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { logout } from "@/app/(auth)/actions";
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import { UrlFeedbackToast } from "@/components/feedback/url-feedback-toast";
 import { AppLogo } from "@/components/app-logo";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -76,6 +77,7 @@ export default async function DashboardLayout({
             </div>
           </header>
           <main className="flex-1 px-5 py-6 sm:px-8 lg:px-10 lg:py-10">
+            <UrlFeedbackToast />
             {children}
           </main>
         </div>

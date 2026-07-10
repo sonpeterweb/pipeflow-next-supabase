@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  getSafeMutationErrorMessage,
+  logServerActionError,
+  redirectWithFeedback,
+  type FeedbackType,
+} from "@/lib/actions/action-result";
+import {
   getQuoteValidationMessage,
   parseQuoteFormData,
 } from "@/lib/quotes/validation";
@@ -11,8 +17,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const quotesPath = "/dashboard/quotes";
 
-function redirectWithMessage(type: "error" | "success", message: string): never {
-  redirect(`${quotesPath}?${type}=${encodeURIComponent(message)}`);
+function redirectWithMessage(type: FeedbackType, message: string): never {
+  redirectWithFeedback(quotesPath, type, message);
 }
 
 async function getAuthenticatedUserId() {
@@ -42,11 +48,12 @@ export async function createQuote(formData: FormData) {
   });
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("createQuote", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("create quote"));
   }
 
   revalidatePath(quotesPath);
-  redirectWithMessage("success", "Quote created.");
+  redirectWithMessage("success", "Quote created successfully.");
 }
 
 export async function updateQuote(quoteId: string, formData: FormData) {
@@ -64,7 +71,8 @@ export async function updateQuote(quoteId: string, formData: FormData) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("updateQuote", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("update quote"));
   }
 
   revalidatePath(quotesPath);
@@ -80,7 +88,8 @@ export async function deleteQuote(quoteId: string) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("deleteQuote", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("delete quote"));
   }
 
   revalidatePath(quotesPath);

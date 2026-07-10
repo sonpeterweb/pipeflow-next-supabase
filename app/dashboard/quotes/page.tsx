@@ -7,7 +7,9 @@ import {
   deleteQuote,
   updateQuote,
 } from "@/app/dashboard/quotes/actions";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/feedback/confirmation-dialog";
+import { SubmitButton } from "@/components/feedback/submit-button";
+import { buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
 import {
   ActionPanel,
@@ -310,7 +312,9 @@ function QuoteForm({
         type="datetime-local"
       />
       <div className="sm:col-span-2">
-        <Button type="submit">{submitLabel}</Button>
+        <SubmitButton pendingLabel={submitLabel.includes("Create") ? "Creating..." : "Saving..."}>
+          {submitLabel}
+        </SubmitButton>
       </div>
     </form>
   );
@@ -381,14 +385,18 @@ function QuoteCard({
 
         <ActionPanel tone="danger">
           <ActionSummary tone="danger">Delete quote</ActionSummary>
-          <form action={deleteQuoteWithId} className="mt-4">
+          <div className="mt-4">
             <p className="mb-3 text-sm text-red-700 dark:text-red-300">
               This permanently removes {quoteTitle}.
             </p>
-            <Button type="submit" variant="destructive">
-              Confirm delete
-            </Button>
-          </form>
+            <ConfirmationDialog
+              action={deleteQuoteWithId}
+              confirmLabel="Delete quote"
+              description={`This will permanently delete ${quoteTitle}. This action cannot be undone.`}
+              title="Delete quote?"
+              triggerLabel="Delete quote"
+            />
+          </div>
         </ActionPanel>
       </div>
     </RecordCard>
@@ -457,18 +465,23 @@ export default async function QuotesPage({ searchParams }: QuotesPageProps) {
         title="Quotes"
       />
 
-      {params.error ? <Message message={params.error} tone="error" /> : null}
-      {params.success ? (
-        <Message message={params.success} tone="success" />
-      ) : null}
       {quotesResult.error ? (
-        <Message message={quotesResult.error.message} tone="error" />
+        <Message
+          message="Unable to load quotes. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
       {customersResult.error ? (
-        <Message message={customersResult.error.message} tone="error" />
+        <Message
+          message="Unable to load customer options. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
       {jobsResult.error ? (
-        <Message message={jobsResult.error.message} tone="error" />
+        <Message
+          message="Unable to load job options. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
 
       <CardSection

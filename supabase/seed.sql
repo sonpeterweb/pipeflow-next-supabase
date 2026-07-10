@@ -22,7 +22,7 @@
 do $$
 declare
   demo_user_email text := 'demo@harbourplumbing.co.nz';
-  demo_user_id uuid;
+  demo_user_id uuid := '742b9691-c4d1-48c1-82e7-12e07b752190';
   anchor_date timestamptz := '2026-07-09 09:00:00+12';
 begin
   select id

@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  getSafeMutationErrorMessage,
+  logServerActionError,
+  redirectWithFeedback,
+  type FeedbackType,
+} from "@/lib/actions/action-result";
+import {
   getJobValidationMessage,
   parseJobFormData,
 } from "@/lib/jobs/validation";
@@ -11,8 +17,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const jobsPath = "/dashboard/jobs";
 
-function redirectWithMessage(type: "error" | "success", message: string): never {
-  redirect(`${jobsPath}?${type}=${encodeURIComponent(message)}`);
+function redirectWithMessage(type: FeedbackType, message: string): never {
+  redirectWithFeedback(jobsPath, type, message);
 }
 
 async function getAuthenticatedUserId() {
@@ -42,11 +48,12 @@ export async function createJob(formData: FormData) {
   });
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("createJob", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("create job"));
   }
 
   revalidatePath(jobsPath);
-  redirectWithMessage("success", "Job created.");
+  redirectWithMessage("success", "Job created successfully.");
 }
 
 export async function updateJob(jobId: string, formData: FormData) {
@@ -64,7 +71,8 @@ export async function updateJob(jobId: string, formData: FormData) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("updateJob", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("update job"));
   }
 
   revalidatePath(jobsPath);
@@ -80,7 +88,8 @@ export async function deleteJob(jobId: string) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("deleteJob", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("delete job"));
   }
 
   revalidatePath(jobsPath);
