@@ -100,6 +100,13 @@ export async function logout() {
   redirect("/login");
 }
 
+function getDemoCredentials() {
+  const email = process.env.DEMO_USER_EMAIL?.trim().toLowerCase() ?? "";
+  const password = process.env.DEMO_USER_PASSWORD?.trim() ?? "";
+
+  return { email, password };
+}
+
 export async function loginDemo(
   state: AuthFormState,
   formData: FormData,
@@ -107,8 +114,7 @@ export async function loginDemo(
   void state;
   void formData;
 
-  const email = process.env.DEMO_USER_EMAIL;
-  const password = process.env.DEMO_USER_PASSWORD;
+  const { email, password } = getDemoCredentials();
 
   if (!email || !password) {
     return {
