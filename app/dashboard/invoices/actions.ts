@@ -13,6 +13,10 @@ import {
   getInvoiceValidationMessage,
   parseInvoiceFormData,
 } from "@/lib/invoices/validation";
+import {
+  demoDeleteDisabledMessage,
+  isDemoUser,
+} from "@/lib/auth/is-demo-user";
 import { createClient } from "@/lib/supabase/server";
 
 const invoicesPath = "/dashboard/invoices";
@@ -31,7 +35,7 @@ async function getAuthenticatedUserId() {
     redirect("/login");
   }
 
-  return { supabase, userId: user.id };
+  return { supabase, user };
 }
 
 export async function createInvoice(formData: FormData) {
@@ -41,10 +45,10 @@ export async function createInvoice(formData: FormData) {
     redirectWithMessage("error", getInvoiceValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase.from("invoices").insert({
     ...parsed.data,
-    user_id: userId,
+    user_id: user.id,
   });
 
   if (error) {
@@ -63,12 +67,12 @@ export async function updateInvoice(invoiceId: string, formData: FormData) {
     redirectWithMessage("error", getInvoiceValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase
     .from("invoices")
     .update(parsed.data)
     .eq("id", invoiceId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("updateInvoice", error);
@@ -80,12 +84,17 @@ export async function updateInvoice(invoiceId: string, formData: FormData) {
 }
 
 export async function deleteInvoice(invoiceId: string) {
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
+
+  if (isDemoUser(user)) {
+    redirectWithMessage("warning", demoDeleteDisabledMessage);
+  }
+
   const { error } = await supabase
     .from("invoices")
     .delete()
     .eq("id", invoiceId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("deleteInvoice", error);

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 
 import { AppLogo } from "@/components/app-logo";
+import { DemoLoginButton } from "@/components/auth/demo-login-button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -320,11 +321,21 @@ export default function Home() {
                     variant: "outline",
                     className: "h-12 w-full px-6 text-base sm:w-auto",
                   })}
-                  href="/dashboard"
+                  href="/login"
                 >
-                  View Demo
+                  Sign In
                 </Link>
+                <DemoLoginButton
+                  className="h-12 w-full px-6 text-base sm:w-auto"
+                  formClassName="w-full sm:w-auto"
+                  label="Explore Demo"
+                  variant="secondary"
+                />
               </div>
+              <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                No sign-up required. Explore a workspace populated with realistic
+                New Zealand trade-business data.
+              </p>
               <div className="mt-8 grid gap-3 text-sm text-slate-600 dark:text-slate-400 sm:grid-cols-3">
                 {["Less admin", "Clear job records", "Faster invoicing"].map(
                   (item) => (
@@ -517,15 +528,11 @@ export default function Home() {
                 >
                   Start Free Trial
                 </Link>
-                <Link
-                  className={buttonVariants({
-                    variant: "outline",
-                    className: "h-12 px-6 text-base",
-                  })}
-                  href="/dashboard"
-                >
-                  Book Demo
-                </Link>
+                <DemoLoginButton
+                  className="h-12 px-6 text-base"
+                  formClassName="w-full sm:w-auto"
+                  label="Open Demo Workspace"
+                />
               </div>
             </div>
           </div>

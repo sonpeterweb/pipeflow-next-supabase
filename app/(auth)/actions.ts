@@ -125,5 +125,18 @@ export async function loginDemo(
     return { ...initialErrorState, message: getDemoLoginErrorMessage(error.message) };
   }
 
+  const { count, error: dataError } = await supabase
+    .from("customers")
+    .select("id", { count: "exact", head: true });
+
+  if (dataError || !count) {
+    console.error("[loginDemo.verifyData]", dataError ?? "No demo customer records found.");
+    await supabase.auth.signOut();
+    return {
+      ...initialErrorState,
+      message: "The demo workspace is temporarily unavailable.",
+    };
+  }
+
   redirect("/dashboard");
 }

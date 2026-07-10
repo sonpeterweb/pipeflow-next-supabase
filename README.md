@@ -15,6 +15,14 @@ The project demonstrates production-ready architecture for a modern business app
 
 Built around realistic workflows used by plumbing, electrical, HVAC, and other field service businesses in New Zealand.
 
+## Live Demo
+
+[Explore PipeFlow](https://pipeflow.sonpeter.com)
+
+Click **Explore Demo** to enter a workspace populated with realistic New Zealand trade-business data.
+
+No sign-up required.
+
 ## Why I Built This
 
 Small trade teams often manage customer notes, job status, quote follow-up, and invoices across disconnected tools. PipeFlow shows how I would design and build a focused operational SaaS MVP for that workflow.
@@ -95,6 +103,8 @@ Fill in `.env.local` with values from your Supabase project:
 ```bash
 NEXT_PUBLIC_SUPABASE_URL=your-project-url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+DEMO_USER_EMAIL=demo@pipeflow.local
+DEMO_USER_PASSWORD=your-demo-password
 ```
 
 Do not commit real Supabase secrets.
@@ -118,6 +128,21 @@ Open [http://localhost:3000](http://localhost:3000).
 If you use the Supabase CLI, run the migration through your normal local database flow. Otherwise, paste the SQL migration into the Supabase SQL editor for a demo project.
 
 To load realistic demo data, create a demo user through the app signup flow, then run `supabase/seed.sql` in the Supabase SQL editor.
+
+## Portfolio Demo Setup
+
+For a hosted portfolio demo:
+
+1. Create a dedicated Supabase Auth user, for example `demo@pipeflow.local`.
+2. Use a strong password and store it only in deployment environment variables.
+3. Copy the demo user's Supabase Auth ID for your own records.
+4. Run `supabase/seed.sql` so the demo records belong to that user.
+5. Set `DEMO_USER_EMAIL` in the local or deployment environment.
+6. Set `DEMO_USER_PASSWORD` in the local or deployment environment.
+7. Restart the dev server or redeploy the application.
+8. Visit the landing page and confirm **Explore Demo** opens `/dashboard`.
+
+Do not commit the demo password, Supabase project identifiers, or private environment values.
 
 ## Commands
 
@@ -153,7 +178,8 @@ This app is ready for Vercel-style deployment:
 1. Create a hosted Supabase project.
 2. Apply the SQL migration.
 3. Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to the deployment environment.
-4. Deploy the Next.js app.
+4. Add `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD` if the hosted demo CTA should be enabled.
+5. Deploy the Next.js app.
 
 ## Portfolio Notes
 

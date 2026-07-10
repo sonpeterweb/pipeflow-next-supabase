@@ -12,16 +12,16 @@
 --
 -- Before running:
 -- 1. Create a demo user through the app signup flow using:
---    demo@harbourplumbing.co.nz
+--    demo@pipeflow.app
 -- 2. Run this file from top to bottom in Supabase SQL Editor.
 --
 -- Reset/reseed strategy:
--- Rerunning this file deletes existing customers, jobs, quotes, and invoices
--- for the selected demo user, then recreates deterministic demo records.
+-- Rerunning this file deletes only the fixed demo UUID ranges, then recreates
+-- deterministic demo records. It does not clear other records for the demo user.
 
 do $$
 declare
-  demo_user_email text := 'demo@harbourplumbing.co.nz';
+  demo_user_email text := 'demo@pipeflow.app';
   demo_user_id uuid := '742b9691-c4d1-48c1-82e7-12e07b752190';
   anchor_date timestamptz := '2026-07-09 09:00:00+12';
 begin
@@ -46,10 +46,21 @@ begin
     full_name = excluded.full_name,
     company_name = excluded.company_name;
 
-  delete from public.invoices where user_id = demo_user_id;
-  delete from public.quotes where user_id = demo_user_id;
-  delete from public.jobs where user_id = demo_user_id;
-  delete from public.customers where user_id = demo_user_id;
+  delete from public.invoices
+  where user_id = demo_user_id
+    and id::text like '40000000-0000-0000-0000-0000000000%';
+
+  delete from public.quotes
+  where user_id = demo_user_id
+    and id::text like '30000000-0000-0000-0000-0000000000%';
+
+  delete from public.jobs
+  where user_id = demo_user_id
+    and id::text like '20000000-0000-0000-0000-0000000000%';
+
+  delete from public.customers
+  where user_id = demo_user_id
+    and id::text like '10000000-0000-0000-0000-0000000000%';
 
   insert into public.customers (
     id,

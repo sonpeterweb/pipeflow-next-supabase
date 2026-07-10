@@ -13,6 +13,10 @@ import {
   getJobValidationMessage,
   parseJobFormData,
 } from "@/lib/jobs/validation";
+import {
+  demoDeleteDisabledMessage,
+  isDemoUser,
+} from "@/lib/auth/is-demo-user";
 import { createClient } from "@/lib/supabase/server";
 
 const jobsPath = "/dashboard/jobs";
@@ -31,7 +35,7 @@ async function getAuthenticatedUserId() {
     redirect("/login");
   }
 
-  return { supabase, userId: user.id };
+  return { supabase, user };
 }
 
 export async function createJob(formData: FormData) {
@@ -41,10 +45,10 @@ export async function createJob(formData: FormData) {
     redirectWithMessage("error", getJobValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase.from("jobs").insert({
     ...parsed.data,
-    user_id: userId,
+    user_id: user.id,
   });
 
   if (error) {
@@ -63,12 +67,12 @@ export async function updateJob(jobId: string, formData: FormData) {
     redirectWithMessage("error", getJobValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase
     .from("jobs")
     .update(parsed.data)
     .eq("id", jobId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("updateJob", error);
@@ -80,12 +84,17 @@ export async function updateJob(jobId: string, formData: FormData) {
 }
 
 export async function deleteJob(jobId: string) {
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
+
+  if (isDemoUser(user)) {
+    redirectWithMessage("warning", demoDeleteDisabledMessage);
+  }
+
   const { error } = await supabase
     .from("jobs")
     .delete()
     .eq("id", jobId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("deleteJob", error);

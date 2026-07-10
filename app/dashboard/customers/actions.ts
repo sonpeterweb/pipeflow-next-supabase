@@ -13,6 +13,10 @@ import {
   getCustomerValidationMessage,
   parseCustomerFormData,
 } from "@/lib/customers/validation";
+import {
+  demoDeleteDisabledMessage,
+  isDemoUser,
+} from "@/lib/auth/is-demo-user";
 import { createClient } from "@/lib/supabase/server";
 
 const customersPath = "/dashboard/customers";
@@ -31,7 +35,7 @@ async function getAuthenticatedUserId() {
     redirect("/login");
   }
 
-  return { supabase, userId: user.id };
+  return { supabase, user };
 }
 
 export async function createCustomer(formData: FormData) {
@@ -41,10 +45,10 @@ export async function createCustomer(formData: FormData) {
     redirectWithMessage("error", getCustomerValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase.from("customers").insert({
     ...parsed.data,
-    user_id: userId,
+    user_id: user.id,
   });
 
   if (error) {
@@ -63,12 +67,12 @@ export async function updateCustomer(customerId: string, formData: FormData) {
     redirectWithMessage("error", getCustomerValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase
     .from("customers")
     .update(parsed.data)
     .eq("id", customerId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("updateCustomer", error);
@@ -80,12 +84,17 @@ export async function updateCustomer(customerId: string, formData: FormData) {
 }
 
 export async function deleteCustomer(customerId: string) {
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
+
+  if (isDemoUser(user)) {
+    redirectWithMessage("warning", demoDeleteDisabledMessage);
+  }
+
   const { error } = await supabase
     .from("customers")
     .delete()
     .eq("id", customerId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("deleteCustomer", error);

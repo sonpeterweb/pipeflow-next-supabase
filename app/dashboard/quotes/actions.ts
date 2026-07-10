@@ -13,6 +13,10 @@ import {
   getQuoteValidationMessage,
   parseQuoteFormData,
 } from "@/lib/quotes/validation";
+import {
+  demoDeleteDisabledMessage,
+  isDemoUser,
+} from "@/lib/auth/is-demo-user";
 import { createClient } from "@/lib/supabase/server";
 
 const quotesPath = "/dashboard/quotes";
@@ -31,7 +35,7 @@ async function getAuthenticatedUserId() {
     redirect("/login");
   }
 
-  return { supabase, userId: user.id };
+  return { supabase, user };
 }
 
 export async function createQuote(formData: FormData) {
@@ -41,10 +45,10 @@ export async function createQuote(formData: FormData) {
     redirectWithMessage("error", getQuoteValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase.from("quotes").insert({
     ...parsed.data,
-    user_id: userId,
+    user_id: user.id,
   });
 
   if (error) {
@@ -63,12 +67,12 @@ export async function updateQuote(quoteId: string, formData: FormData) {
     redirectWithMessage("error", getQuoteValidationMessage(parsed.error));
   }
 
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
   const { error } = await supabase
     .from("quotes")
     .update(parsed.data)
     .eq("id", quoteId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("updateQuote", error);
@@ -80,12 +84,17 @@ export async function updateQuote(quoteId: string, formData: FormData) {
 }
 
 export async function deleteQuote(quoteId: string) {
-  const { supabase, userId } = await getAuthenticatedUserId();
+  const { supabase, user } = await getAuthenticatedUserId();
+
+  if (isDemoUser(user)) {
+    redirectWithMessage("warning", demoDeleteDisabledMessage);
+  }
+
   const { error } = await supabase
     .from("quotes")
     .delete()
     .eq("id", quoteId)
-    .eq("user_id", userId);
+    .eq("user_id", user.id);
 
   if (error) {
     logServerActionError("deleteQuote", error);

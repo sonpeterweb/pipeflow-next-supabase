@@ -2,7 +2,8 @@
 
 import { useActionState } from "react";
 
-import { login, loginDemo, type AuthFormState } from "@/app/(auth)/actions";
+import { login, type AuthFormState } from "@/app/(auth)/actions";
+import { DemoLoginButton } from "@/components/auth/demo-login-button";
 import { Button } from "@/components/ui/button";
 import {
   Field,
@@ -12,26 +13,6 @@ import {
 } from "@/components/ui/form-controls";
 
 const initialState: AuthFormState = {};
-
-function DemoLoginForm() {
-  const [state, action, pending] = useActionState(loginDemo, initialState);
-
-  return (
-    <form action={action} className="mt-3">
-      {state.message ? (
-        <p
-          className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-sm font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300"
-          role="alert"
-        >
-          {state.message}
-        </p>
-      ) : null}
-      <Button className="w-full" disabled={pending} type="submit" variant="outline">
-        {pending ? "Opening demo..." : "Open demo account"}
-      </Button>
-    </form>
-  );
-}
 
 export function LoginForm() {
   const [state, action, pending] = useActionState(login, initialState);
@@ -85,7 +66,15 @@ export function LoginForm() {
           {pending ? "Signing in..." : "Sign In"}
         </Button>
       </form>
-      <DemoLoginForm />
+      <div className="mt-4 border-t border-slate-200 pt-4 dark:border-slate-800">
+        <p className="mb-3 text-center text-sm text-slate-600 dark:text-slate-400">
+          No sign-up required.
+        </p>
+        <DemoLoginButton
+          className="w-full"
+          label="Continue with Demo Account"
+        />
+      </div>
     </>
   );
 }
