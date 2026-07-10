@@ -11,6 +11,7 @@ import {
 
 import { logout } from "@/app/(auth)/actions";
 import { updateWorkspaceProfile } from "@/app/dashboard/settings/actions";
+import { SubmitButton } from "@/components/feedback/submit-button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,13 +44,6 @@ type ToggleRowProps = {
   description: string;
   disabled?: boolean;
   title: string;
-};
-
-type SettingsPageProps = {
-  searchParams: Promise<{
-    error?: string;
-    success?: string;
-  }>;
 };
 
 function SettingsSection({
@@ -129,26 +123,7 @@ function DisabledNotice({ children }: { children: React.ReactNode }) {
   );
 }
 
-function Message({
-  message,
-  tone,
-}: {
-  message: string;
-  tone: "error" | "success";
-}) {
-  const classes =
-    tone === "error"
-      ? "border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 text-red-700 dark:text-red-300"
-      : "border-green-200 dark:border-green-900 bg-green-50 dark:bg-green-950/50 text-green-800 dark:text-green-300";
-
-  return (
-    <p className={`rounded-lg border px-4 py-3 text-sm font-medium ${classes}`}>
-      {message}
-    </p>
-  );
-}
-
-export default async function SettingsPage({ searchParams }: SettingsPageProps) {
+export default async function SettingsPage() {
   const supabase = await createClient();
   const {
     data: { user },
@@ -158,7 +133,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
     redirect("/login");
   }
 
-  const params = await searchParams;
   const { data: profile } = await supabase
     .from("profiles")
     .select("company_name,full_name")
@@ -189,9 +163,6 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
           account access for your plumbing business.
         </p>
       </div>
-
-      {params.error ? <Message message={params.error} tone="error" /> : null}
-      {params.success ? <Message message={params.success} tone="success" /> : null}
 
       <SettingsSection
         description="Basic business identity shown throughout the workspace."
@@ -227,7 +198,7 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
               Profile changes are saved to Supabase and reflected across the
               workspace.
             </DisabledNotice>
-            <Button type="submit">Save workspace</Button>
+            <SubmitButton pendingLabel="Saving...">Save workspace</SubmitButton>
           </SettingsFooter>
         </form>
       </SettingsSection>

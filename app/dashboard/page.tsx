@@ -94,9 +94,20 @@ function MetricCard({
 
 function ErrorMessage({ message }: { message: string }) {
   return (
-    <p className="rounded-lg border border-red-200 dark:border-red-900 bg-red-50 dark:bg-red-950/40 px-4 py-3 text-sm font-medium text-red-700 dark:text-red-300">
-      {message}
-    </p>
+    <div className="rounded-xl border border-red-200 bg-red-50 p-6 dark:border-red-900 dark:bg-red-950/40">
+      <h2 className="text-base font-semibold text-red-800 dark:text-red-200">
+        Unable to load dashboard data
+      </h2>
+      <p className="mt-2 text-sm leading-6 text-red-700 dark:text-red-300">
+        {message}
+      </p>
+      <Link
+        className={buttonVariants({ className: "mt-4", variant: "outline" })}
+        href="/dashboard"
+      >
+        Try again
+      </Link>
+    </div>
   );
 }
 
@@ -159,6 +170,26 @@ export default async function DashboardPage() {
       .select("status,amount")
       .eq("user_id", user.id),
   ]);
+
+  if (customersResult.error || jobsResult.error || invoicesResult.error) {
+    return (
+      <section className="space-y-8">
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-wide text-brand-primary">
+            Dashboard
+          </p>
+          <h1 className="mt-2 text-3xl font-semibold tracking-tight text-slate-950 dark:text-slate-100 sm:text-4xl">
+            Business overview
+          </h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
+            Live overview of customers, jobs, invoices, and revenue signals for
+            your PipeFlow workspace.
+          </p>
+        </div>
+        <ErrorMessage message="Refresh the page or try again shortly." />
+      </section>
+    );
+  }
 
   const metrics = calculateDashboardMetrics({
     invoices: (invoicesResult.data ?? []) as DashboardInvoiceMetricRow[],
@@ -232,16 +263,6 @@ export default async function DashboardPage() {
           </Link>
         </div>
       </div>
-
-      {customersResult.error ? (
-        <ErrorMessage message={customersResult.error.message} />
-      ) : null}
-      {jobsResult.error ? (
-        <ErrorMessage message={jobsResult.error.message} />
-      ) : null}
-      {invoicesResult.error ? (
-        <ErrorMessage message={invoicesResult.error.message} />
-      ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         <MetricCard

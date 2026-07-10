@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  getSafeMutationErrorMessage,
+  logServerActionError,
+  redirectWithFeedback,
+  type FeedbackType,
+} from "@/lib/actions/action-result";
+import {
   getCustomerValidationMessage,
   parseCustomerFormData,
 } from "@/lib/customers/validation";
@@ -11,8 +17,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const customersPath = "/dashboard/customers";
 
-function redirectWithMessage(type: "error" | "success", message: string): never {
-  redirect(`${customersPath}?${type}=${encodeURIComponent(message)}`);
+function redirectWithMessage(type: FeedbackType, message: string): never {
+  redirectWithFeedback(customersPath, type, message);
 }
 
 async function getAuthenticatedUserId() {
@@ -42,11 +48,12 @@ export async function createCustomer(formData: FormData) {
   });
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("createCustomer", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("create customer"));
   }
 
   revalidatePath(customersPath);
-  redirectWithMessage("success", "Customer created.");
+  redirectWithMessage("success", "Customer created successfully.");
 }
 
 export async function updateCustomer(customerId: string, formData: FormData) {
@@ -64,11 +71,12 @@ export async function updateCustomer(customerId: string, formData: FormData) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("updateCustomer", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("update customer"));
   }
 
   revalidatePath(customersPath);
-  redirectWithMessage("success", "Customer updated.");
+  redirectWithMessage("success", "Customer details updated.");
 }
 
 export async function deleteCustomer(customerId: string) {
@@ -80,7 +88,8 @@ export async function deleteCustomer(customerId: string) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("deleteCustomer", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("delete customer"));
   }
 
   revalidatePath(customersPath);

@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import {
+  getSafeMutationErrorMessage,
+  logServerActionError,
+  redirectWithFeedback,
+  type FeedbackType,
+} from "@/lib/actions/action-result";
+import {
   getInvoiceValidationMessage,
   parseInvoiceFormData,
 } from "@/lib/invoices/validation";
@@ -11,8 +17,8 @@ import { createClient } from "@/lib/supabase/server";
 
 const invoicesPath = "/dashboard/invoices";
 
-function redirectWithMessage(type: "error" | "success", message: string): never {
-  redirect(`${invoicesPath}?${type}=${encodeURIComponent(message)}`);
+function redirectWithMessage(type: FeedbackType, message: string): never {
+  redirectWithFeedback(invoicesPath, type, message);
 }
 
 async function getAuthenticatedUserId() {
@@ -42,11 +48,12 @@ export async function createInvoice(formData: FormData) {
   });
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("createInvoice", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("create invoice"));
   }
 
   revalidatePath(invoicesPath);
-  redirectWithMessage("success", "Invoice created.");
+  redirectWithMessage("success", "Invoice created successfully.");
 }
 
 export async function updateInvoice(invoiceId: string, formData: FormData) {
@@ -64,7 +71,8 @@ export async function updateInvoice(invoiceId: string, formData: FormData) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("updateInvoice", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("update invoice"));
   }
 
   revalidatePath(invoicesPath);
@@ -80,7 +88,8 @@ export async function deleteInvoice(invoiceId: string) {
     .eq("user_id", userId);
 
   if (error) {
-    redirectWithMessage("error", error.message);
+    logServerActionError("deleteInvoice", error);
+    redirectWithMessage("error", getSafeMutationErrorMessage("delete invoice"));
   }
 
   revalidatePath(invoicesPath);

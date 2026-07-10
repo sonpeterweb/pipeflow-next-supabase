@@ -7,7 +7,9 @@ import {
   deleteCustomer,
   updateCustomer,
 } from "@/app/dashboard/customers/actions";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/feedback/confirmation-dialog";
+import { SubmitButton } from "@/components/feedback/submit-button";
+import { buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
 import {
   ActionPanel,
@@ -175,7 +177,9 @@ function CustomerForm({
       </Field>
       <NotesField defaultValue={fieldValue(customer?.notes ?? null)} />
       <div className="sm:col-span-2">
-        <Button type="submit">{submitLabel}</Button>
+        <SubmitButton pendingLabel={submitLabel.includes("Create") ? "Creating..." : "Saving..."}>
+          {submitLabel}
+        </SubmitButton>
       </div>
     </form>
   );
@@ -242,15 +246,19 @@ function CustomerCard({ customer }: { customer: Customer }) {
 
         <ActionPanel tone="danger">
           <ActionSummary tone="danger">Delete customer</ActionSummary>
-          <form action={deleteCustomerWithId} className="mt-4">
+          <div className="mt-4">
             <p className="mb-3 text-sm text-red-700 dark:text-red-300">
               This removes {customer.name}. Existing linked records may keep a
               blank customer reference.
             </p>
-            <Button type="submit" variant="destructive">
-              Confirm delete
-            </Button>
-          </form>
+            <ConfirmationDialog
+              action={deleteCustomerWithId}
+              confirmLabel="Delete customer"
+              description={`This will permanently delete ${customer.name} and may affect related records. This action cannot be undone.`}
+              title="Delete customer?"
+              triggerLabel="Delete customer"
+            />
+          </div>
         </ActionPanel>
       </div>
     </RecordCard>
@@ -297,11 +305,12 @@ export default async function CustomersPage({
         title="Customers"
       />
 
-      {params.error ? <Message message={params.error} tone="error" /> : null}
-      {params.success ? (
-        <Message message={params.success} tone="success" />
+      {error ? (
+        <Message
+          message="Unable to load customers. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
-      {error ? <Message message={error.message} tone="error" /> : null}
 
       <CardSection
         className="scroll-mt-6"

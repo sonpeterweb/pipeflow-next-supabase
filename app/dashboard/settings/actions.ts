@@ -4,6 +4,12 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import {
+  getSafeMutationErrorMessage,
+  logServerActionError,
+  redirectWithFeedback,
+  type FeedbackType,
+} from "@/lib/actions/action-result";
 import { createClient } from "@/lib/supabase/server";
 
 const settingsPath = "/dashboard/settings";
@@ -22,8 +28,8 @@ const workspaceProfileSchema = z.object({
     .transform((value) => value || null),
 });
 
-function redirectWithMessage(type: "error" | "success", message: string): never {
-  redirect(`${settingsPath}?${type}=${encodeURIComponent(message)}`);
+function redirectWithMessage(type: FeedbackType, message: string): never {
+  redirectWithFeedback(settingsPath, type, message);
 }
 
 export async function updateWorkspaceProfile(formData: FormData) {
@@ -52,7 +58,8 @@ export async function updateWorkspaceProfile(formData: FormData) {
   });
 
   if (profileError) {
-    redirectWithMessage("error", profileError.message);
+    logServerActionError("updateWorkspaceProfile.profile", profileError);
+    redirectWithMessage("error", getSafeMutationErrorMessage("save settings"));
   }
 
   const { error: authError } = await supabase.auth.updateUser({
@@ -63,9 +70,10 @@ export async function updateWorkspaceProfile(formData: FormData) {
   });
 
   if (authError) {
-    redirectWithMessage("error", authError.message);
+    logServerActionError("updateWorkspaceProfile.auth", authError);
+    redirectWithMessage("error", getSafeMutationErrorMessage("save settings"));
   }
 
   revalidatePath(settingsPath);
-  redirectWithMessage("success", "Workspace profile updated.");
+  redirectWithMessage("success", "Settings saved.");
 }

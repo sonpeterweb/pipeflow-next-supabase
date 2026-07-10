@@ -7,7 +7,9 @@ import {
   deleteInvoice,
   updateInvoice,
 } from "@/app/dashboard/invoices/actions";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/feedback/confirmation-dialog";
+import { SubmitButton } from "@/components/feedback/submit-button";
+import { buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
 import {
   ActionPanel,
@@ -317,7 +319,9 @@ function InvoiceForm({
         type="datetime-local"
       />
       <div className="sm:col-span-2">
-        <Button type="submit">{submitLabel}</Button>
+        <SubmitButton pendingLabel={submitLabel.includes("Create") ? "Creating..." : "Saving..."}>
+          {submitLabel}
+        </SubmitButton>
       </div>
     </form>
   );
@@ -389,14 +393,18 @@ function InvoiceCard({
 
         <ActionPanel tone="danger">
           <ActionSummary tone="danger">Delete invoice</ActionSummary>
-          <form action={deleteInvoiceWithId} className="mt-4">
+          <div className="mt-4">
             <p className="mb-3 text-sm text-red-700 dark:text-red-300">
               This permanently removes {invoiceTitle}.
             </p>
-            <Button type="submit" variant="destructive">
-              Confirm delete
-            </Button>
-          </form>
+            <ConfirmationDialog
+              action={deleteInvoiceWithId}
+              confirmLabel="Delete invoice"
+              description={`This will permanently delete ${invoiceTitle}. This action cannot be undone.`}
+              title="Delete invoice?"
+              triggerLabel="Delete invoice"
+            />
+          </div>
         </ActionPanel>
       </div>
     </RecordCard>
@@ -466,18 +474,23 @@ export default async function InvoicesPage({ searchParams }: InvoicesPageProps) 
         title="Invoices"
       />
 
-      {params.error ? <Message message={params.error} tone="error" /> : null}
-      {params.success ? (
-        <Message message={params.success} tone="success" />
-      ) : null}
       {invoicesResult.error ? (
-        <Message message={invoicesResult.error.message} tone="error" />
+        <Message
+          message="Unable to load invoices. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
       {customersResult.error ? (
-        <Message message={customersResult.error.message} tone="error" />
+        <Message
+          message="Unable to load customer options. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
       {jobsResult.error ? (
-        <Message message={jobsResult.error.message} tone="error" />
+        <Message
+          message="Unable to load job options. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
 
       <CardSection

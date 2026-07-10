@@ -3,7 +3,9 @@ import Link from "next/link";
 import { Plus, Wrench } from "lucide-react";
 
 import { createJob, deleteJob, updateJob } from "@/app/dashboard/jobs/actions";
-import { Button, buttonVariants } from "@/components/ui/button";
+import { ConfirmationDialog } from "@/components/feedback/confirmation-dialog";
+import { SubmitButton } from "@/components/feedback/submit-button";
+import { buttonVariants } from "@/components/ui/button";
 import { CardSection } from "@/components/ui/card";
 import {
   ActionPanel,
@@ -346,7 +348,9 @@ function JobForm({
         name="description"
       />
       <div className="sm:col-span-2">
-        <Button type="submit">{submitLabel}</Button>
+        <SubmitButton pendingLabel={submitLabel.includes("Create") ? "Creating..." : "Saving..."}>
+          {submitLabel}
+        </SubmitButton>
       </div>
     </form>
   );
@@ -422,14 +426,18 @@ function JobCard({
 
         <ActionPanel tone="danger">
           <ActionSummary tone="danger">Delete job</ActionSummary>
-          <form action={deleteJobWithId} className="mt-4">
+          <div className="mt-4">
             <p className="mb-3 text-sm text-red-700 dark:text-red-300">
               This permanently removes {job.title}.
             </p>
-            <Button type="submit" variant="destructive">
-              Confirm delete
-            </Button>
-          </form>
+            <ConfirmationDialog
+              action={deleteJobWithId}
+              confirmLabel="Delete job"
+              description={`This will permanently delete ${job.title}. This action cannot be undone.`}
+              title="Delete job?"
+              triggerLabel="Delete job"
+            />
+          </div>
         </ActionPanel>
       </div>
     </RecordCard>
@@ -491,15 +499,17 @@ export default async function JobsPage({ searchParams }: JobsPageProps) {
         title="Jobs"
       />
 
-      {params.error ? <Message message={params.error} tone="error" /> : null}
-      {params.success ? (
-        <Message message={params.success} tone="success" />
-      ) : null}
       {jobsResult.error ? (
-        <Message message={jobsResult.error.message} tone="error" />
+        <Message
+          message="Unable to load jobs. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
       {customersResult.error ? (
-        <Message message={customersResult.error.message} tone="error" />
+        <Message
+          message="Unable to load customer options. Refresh the page or try again shortly."
+          tone="error"
+        />
       ) : null}
 
       <CardSection
