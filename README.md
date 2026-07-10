@@ -17,11 +17,35 @@ Built around realistic workflows used by plumbing, electrical, HVAC, and other f
 
 ## Live Demo
 
-[Explore PipeFlow](https://pipeflow.sonpeter.com)
+[![Explore Demo](https://img.shields.io/badge/Explore%20Demo-2563EB?style=for-the-badge)](https://pipeflow.sonpeter.com/demo)
 
-Click **Explore Demo** to enter a workspace populated with realistic New Zealand trade-business data.
+Click **Explore Demo** to open a workspace populated with realistic New Zealand trade-business data. No sign-up required.
 
-No sign-up required.
+## Screenshots
+
+### Landing
+
+![Landing](screenshots/hero.png)
+
+### Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+### Customers
+
+![Customers](screenshots/customers.png)
+
+### Jobs
+
+![Jobs](screenshots/jobs.png)
+
+### Quotes
+
+![Quotes](screenshots/quotes.png)
+
+### Invoices
+
+![Invoices](screenshots/invoices.png)
 
 ## Why I Built This
 
@@ -140,7 +164,7 @@ For a hosted portfolio demo:
 5. Set `DEMO_USER_EMAIL` in the local or deployment environment.
 6. Set `DEMO_USER_PASSWORD` in the local or deployment environment.
 7. Restart the dev server or redeploy the application.
-8. Visit the landing page and confirm **Explore Demo** opens `/dashboard`.
+8. Open `/demo` (or click **Explore Demo** in the README / landing page) and confirm it lands on `/dashboard`.
 
 Do not commit the demo password, Supabase project identifiers, or private environment values.
 

@@ -5,8 +5,8 @@ import { redirect } from "next/navigation";
 import type { ActionResult } from "@/lib/actions/action-result";
 import {
   getAuthErrorMessage,
-  getDemoLoginErrorMessage,
 } from "@/lib/auth/auth-error-messages";
+import { openDemoWorkspace } from "@/lib/auth/open-demo-workspace";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthFormState = Partial<ActionResult>;
@@ -100,13 +100,6 @@ export async function logout() {
   redirect("/login");
 }
 
-function getDemoCredentials() {
-  const email = process.env.DEMO_USER_EMAIL?.trim().toLowerCase() ?? "";
-  const password = process.env.DEMO_USER_PASSWORD?.trim() ?? "";
-
-  return { email, password };
-}
-
 export async function loginDemo(
   state: AuthFormState,
   formData: FormData,
@@ -114,34 +107,10 @@ export async function loginDemo(
   void state;
   void formData;
 
-  const { email, password } = getDemoCredentials();
+  const result = await openDemoWorkspace();
 
-  if (!email || !password) {
-    return {
-      ...initialErrorState,
-      message: getDemoLoginErrorMessage("missing demo credentials"),
-    };
-  }
-
-  const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({ email, password });
-
-  if (error) {
-    console.error("[loginDemo]", error);
-    return { ...initialErrorState, message: getDemoLoginErrorMessage(error.message) };
-  }
-
-  const { count, error: dataError } = await supabase
-    .from("customers")
-    .select("id", { count: "exact", head: true });
-
-  if (dataError || !count) {
-    console.error("[loginDemo.verifyData]", dataError ?? "No demo customer records found.");
-    await supabase.auth.signOut();
-    return {
-      ...initialErrorState,
-      message: "The demo workspace is temporarily unavailable.",
-    };
+  if (!result.ok) {
+    return { ...initialErrorState, message: result.message };
   }
 
   redirect("/dashboard");
