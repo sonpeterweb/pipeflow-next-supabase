@@ -53,6 +53,29 @@ Small trade teams often manage customer notes, job status, quote follow-up, and 
 
 The goal is not just to show CRUD screens. The app is structured around the kind of secure, maintainable, client-facing product foundation a real service business could build on.
 
+## Architecture
+
+```text
+Browser
+    │
+    ▼
+Next.js 16 (App Router)
+    │
+    ▼
+Server Actions
+    │
+    ▼
+Supabase Auth
+    │
+    ▼
+PostgreSQL Database
+    │
+    ▼
+Row Level Security (RLS)
+```
+
+PipeFlow uses a modern Next.js App Router architecture with Server Actions for secure mutations. Authentication is handled by Supabase Auth, while PostgreSQL and Row Level Security (RLS) ensure each user can only access their own workspace data.
+
 ## Tech Stack
 
 - Next.js 16 App Router
@@ -66,21 +89,16 @@ The goal is not just to show CRUD screens. The app is structured around the kind
 - Vitest, React Testing Library, Playwright, and jsdom
 - pnpm
 
-## Product Features
+## Features
 
-- Public marketing page for the SaaS product
-- Email/password authentication with Supabase
-- Protected dashboard routes
-- Live dashboard metrics from workspace data
-- Customer lifecycle management
-- Job tracking with status, priority, schedule, and customer links
-- Quote management with optional customer and job links
-- Invoice tracking with draft, sent, paid, overdue, and cancelled states
-- Persisted workspace profile settings backed by Supabase profiles
-- Settings interface for account, workspace, regional, and appearance preferences
-- SQL migration for schema, indexes, triggers, and RLS policies
-- Realistic demo seed data for local or hosted portfolio demos
-- Focused unit, validation, and Playwright smoke tests
+- Secure authentication with Supabase
+- Customer management
+- Job tracking
+- Quote management
+- Invoice management
+- Dashboard analytics
+- Responsive UI
+- One-click demo workspace
 
 ## Implementation Highlights
 
@@ -205,18 +223,27 @@ This app is ready for Vercel-style deployment:
 4. Add `DEMO_USER_EMAIL` and `DEMO_USER_PASSWORD` if the hosted demo CTA should be enabled.
 5. Deploy the Next.js app.
 
-## Portfolio Notes
+## Portfolio Purpose
 
-This project reflects how I build modern business applications for real clients: secure authentication, scalable data models, clean UI, maintainable architecture, and production-focused development practices.
+PipeFlow was built as a production-style portfolio project to demonstrate how I design and develop modern business applications using Next.js, React, TypeScript, and Supabase. It reflects the architecture, development practices, and user experience I bring to real client projects.
 
-## Roadmap
+## What this project demonstrates
 
-Potential future work:
+This project showcases modern SaaS application development practices, including:
 
-- Recent activity timeline on the dashboard
-- Role-based teams
-- Quote and invoice PDF generation
-- Payments
-- Customer portal
+- Modern Next.js App Router architecture
+- Secure authentication with Supabase Auth
+- Row Level Security (RLS)
+- Server Actions
+- Full CRUD workflows
+- Responsive dashboard UI
+- Form validation with Zod
+- Reusable component architecture
+- Automated testing with Vitest
+- Production-focused development workflow
 
-These are outside the current MVP scope.
+## License
+
+This project is provided for portfolio and demonstration purposes.
+
+You are welcome to explore the source code for learning and evaluation. Redistribution or commercial reuse of the project or its assets is not permitted without prior permission.
